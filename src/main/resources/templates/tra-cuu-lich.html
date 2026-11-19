@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra cứu lịch phòng</title>
+    <style>
+        * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+        body { margin: 0; background: #f4f6f9; color: #1f2937; }
+        .topbar {
+            background: #1c355e;
+            color: #ffffff;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .topbar-brand {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: 700;
+        }
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+        .role-badge {
+            background: #ffffff;
+            color: #1c355e;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .btn-logout-link {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            color: #ffffff;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-logout-link:hover { background: rgba(255, 255, 255, 0.12); }
+
+        .container {
+            max-width: 1140px;
+            margin: 28px auto;
+            padding: 0 16px;
+        }
+        .panel {
+            background: #ffffff;
+            border: 1px solid #d9dee6;
+            border-radius: 6px;
+            padding: 24px;
+        }
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .page-title {
+            margin: 0 0 4px;
+            color: #1c355e;
+            font-size: 22px;
+        }
+        .page-subtitle {
+            margin: 0;
+            color: #5b6777;
+            font-size: 13px;
+        }
+        .btn-secondary {
+            display: inline-block;
+            padding: 8px 14px;
+            border: 1px solid #c6cdd8;
+            border-radius: 4px;
+            background: #ffffff;
+            color: #1f2937;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-secondary:hover { background: #f8fafc; }
+        .btn-primary {
+            display: inline-block;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #1c355e;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-primary:hover { background: #152847; }
+
+        .filter-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            padding: 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 18px;
+            align-items: end;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #c6cdd8;
+            border-radius: 4px;
+            font-size: 13px;
+            background: #ffffff;
+        }
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .alert-error {
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            border-radius: 4px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            font-size: 13px;
+        }
+        .alert-empty {
+            padding: 16px;
+            border-radius: 4px;
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            color: #475569;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .table-wrap { overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th, td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1c355e;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        tr:hover td { background: #f9fafb; }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .badge-active { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+        .badge-inactive { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+        .badge-free { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .slot-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .slot-item {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .action-links {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 1000;
+        }
+        .modal-backdrop.open { display: flex; }
+        .modal-box {
+            width: 100%;
+            max-width: 380px;
+            background: #ffffff;
+            border-radius: 6px;
+            padding: 22px;
+            border: 1px solid #d9dee6;
+        }
+        .modal-box h2 { margin: 0 0 10px; font-size: 18px; color: #1c355e; }
+        .modal-box p { margin: 0 0 18px; font-size: 14px; color: #374151; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+        .btn-stay {
+            padding: 8px 14px;
+            border: 1px solid #c6cdd8;
+            border-radius: 4px;
+            background: #ffffff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-confirm-logout {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 4px;
+            background: #1c355e;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{trang-chu :: header(${nguoiDung})}"></div>
+
+<main class="container">
+    <section class="panel">
+        <div class="header-row">
+            <div>
+                <h1 class="page-title">Tra cứu lịch phòng</h1>
+                <p class="page-subtitle">Tìm kiếm phòng và kiểm tra khung giờ.</p>
+            </div>
+            <a class="btn-secondary" th:href="@{/trang-chu}">Quay lại trang chủ</a>
+        </div>
+
+        <form class="filter-form" th:action="@{/tra-cuu-lich}" method="get">
+            <div class="form-group">
+                <label for="ngay">Ngày sử dụng</label>
+                <input type="date" id="ngay" name="ngay" th:value="${ngay}">
+            </div>
+
+            <div class="form-group">
+                <label for="loaiPhong">Loại phòng</label>
+                <select id="loaiPhong" name="loaiPhong">
+                    <option value="">-- Tất cả --</option>
+                    <option th:each="lp : ${dsLoaiPhong}"
+                            th:value="${lp}"
+                            th:text="${lp}"
+                            th:selected="${lp == loaiPhong}">Loại phòng</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="sucChua">Sức chứa tối thiểu</label>
+                <input type="number" id="sucChua" name="sucChua" min="1" placeholder="Ví dụ: 50"
+                       th:value="${sucChua}">
+            </div>
+
+            <div class="form-group">
+                <label for="tinhTrang">Tình trạng</label>
+                <select id="tinhTrang" name="tinhTrang">
+                    <option value="">-- Tất cả --</option>
+                    <option th:each="tt : ${dsTinhTrang}"
+                            th:value="${tt}"
+                            th:text="${tt}"
+                            th:selected="${tt == tinhTrang}">Tình trạng</option>
+                </select>
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn-primary">Tìm kiếm</button>
+                <a class="btn-secondary" th:href="@{/tra-cuu-lich}">Đặt lại</a>
+            </div>
+        </form>
+
+        <div class="alert-error" th:if="${errorMessage != null}" th:text="${errorMessage}">Thông báo lỗi</div>
+
+        <div class="alert-empty" th:if="${#lists.isEmpty(ketQuaList)}">
+            Không tìm thấy phòng phù hợp với tiêu chí lọc đã chọn.
+        </div>
+
+        <div class="table-wrap" th:if="${!#lists.isEmpty(ketQuaList)}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Mã phòng</th>
+                    <th>Tên phòng</th>
+                    <th>Vị trí</th>
+                    <th>Loại phòng</th>
+                    <th>Sức chứa</th>
+                    <th>Trang thiết bị</th>
+                    <th>Tình trạng</th>
+                    <th>Lịch sử dụng ngày <span th:text="${#temporals.format(ngay, 'dd/MM/yyyy')}"></span></th>
+                    <th>Thao tác</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${ketQuaList}">
+                    <td th:text="${item.phong.maPhong}">HT-A2</td>
+                    <td>
+                        <strong th:text="${item.phong.tenPhong}">Hội trường A2</strong>
+                    </td>
+                    <td th:text="${'Nhà ' + item.phong.toaNha + ' - Tầng ' + item.phong.tang}">Nhà A2 - Tầng 1</td>
+                    <td th:text="${item.phong.loaiPhong}">Hội trường</td>
+                    <td th:text="${item.phong.sucChuaToiDa + ' chỗ'}">300 chỗ</td>
+                    <td th:text="${item.phong.trangThietBi != null && !#strings.isEmpty(item.phong.trangThietBi) ? item.phong.trangThietBi : 'Không có thông tin'}">máy chiếu</td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${item.sanSangMuon} ? 'badge-active' : 'badge-inactive'"
+                              th:text="${item.phong.tinhTrang}">Đang hoạt động</span>
+                    </td>
+                    <td>
+                        <span class="badge badge-free" th:if="${!item.coLichTrongNgay}">Trống</span>
+                        <ul class="slot-list" th:if="${item.coLichTrongNgay}">
+                            <li class="slot-item" th:each="lich : ${item.lichTrongNgay}"
+                                th:text="${lich.khungGioText}">08:00 - 11:00</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <div class="action-links">
+                            <a class="btn-secondary btn-sm"
+                               th:href="@{/tra-cuu-lich/{id}(id=${item.phong.id}, ngay=${ngay})}">Chi tiết</a>
+                            <a class="btn-primary btn-sm"
+                               th:if="${item.sanSangMuon}"
+                               th:href="@{/nop-don(phongId=${item.phong.id}, ngaySuDung=${ngay})}">Nộp đơn</a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<div th:replace="~{trang-chu :: logoutModal}"></div>
+
+</body>
+</html>

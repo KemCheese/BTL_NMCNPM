@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang chủ</title>
+    <style>
+        * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+        body { margin: 0; background: #f4f6f9; color: #1f2937; }
+        .topbar {
+            background: #1c355e;
+            color: #ffffff;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .topbar-brand {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: 700;
+        }
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+        .role-badge {
+            background: #ffffff;
+            color: #1c355e;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .btn-logout-link {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            color: #ffffff;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-logout-link:hover { background: rgba(255, 255, 255, 0.12); }
+
+        .container {
+            max-width: 960px;
+            margin: 28px auto;
+            padding: 0 16px;
+        }
+        .panel {
+            background: #ffffff;
+            border: 1px solid #d9dee6;
+            border-radius: 6px;
+            padding: 24px;
+        }
+        .page-title {
+            margin: 0 0 6px;
+            color: #1c355e;
+            font-size: 22px;
+        }
+        .page-subtitle {
+            margin: 0 0 20px;
+            color: #9a3412;
+            font-size: 13px;
+        }
+        .menu-card {
+            max-width: 340px;
+            border: 1px solid #cfd6e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .menu-card-header {
+            background: #f1f5f9;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #1c355e;
+            border-bottom: 1px solid #cfd6e0;
+        }
+        .menu-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .menu-list li {
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .menu-list li:last-child { border-bottom: none; }
+        .menu-list a, .menu-list button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 11px 14px;
+            color: #1f2937;
+            text-decoration: none;
+            background: #ffffff;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .menu-list a:hover, .menu-list button:hover {
+            background: #f8fafc;
+            color: #1c355e;
+        }
+        .status-bar {
+            padding: 10px 14px;
+            background: #f8fafc;
+            border: 1px solid #d9dee6;
+            border-radius: 4px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .status-pill {
+            border: 1px solid #1c355e;
+            color: #1c355e;
+            padding: 2px 9px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 1000;
+        }
+        .modal-backdrop.open { display: flex; }
+        .modal-box {
+            width: 100%;
+            max-width: 380px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 22px 24px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        .modal-box h2 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            color: #1f2937;
+        }
+        .modal-box p {
+            margin: 0 0 6px;
+            font-size: 13px;
+            color: #4b5563;
+        }
+        .modal-actions {
+            margin-top: 18px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-stay {
+            padding: 8px 16px;
+            border: 1px solid #94a3b8;
+            border-radius: 4px;
+            background: #f8fafc;
+            color: #1c355e;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-confirm-logout {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #1c355e;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<header class="topbar" th:fragment="header(nguoiDung)">
+    <a class="topbar-brand" th:href="@{/trang-chu}">Hệ thống mượn phòng trực tuyến PTIT</a>
+    <div class="topbar-user" th:if="${nguoiDung != null}">
+        <span th:text="${nguoiDung.hoTen}">Người dùng</span>
+        <span class="role-badge" th:text="${nguoiDung.vaiTroDisplay}">VAI TRÒ</span>
+        <span>|</span>
+        <a class="btn-logout-link" th:href="@{/xac-nhan-dang-xuat}" onclick="openLogoutModal(event)">Đăng xuất</a>
+    </div>
+</header>
+
+<main class="container">
+    <section class="panel">
+        <h1 class="page-title">Trang chủ</h1>
+        <p class="page-subtitle">Chức năng</p>
+
+        <div class="menu-card" th:if="${nguoiDung.vaiTroCode == 'NGUOI_MUON'}">
+            <div class="menu-card-header">NGƯỜI MƯỢN</div>
+            <ul class="menu-list">
+                <li><a th:href="@{/tra-cuu-lich}">Tra cứu lịch phòng</a></li>
+                <li><a th:href="@{/nop-don}">Nộp đơn</a></li>
+                <li><a th:href="@{/theo-doi-don}">Theo dõi đơn</a></li>
+                <li>
+                    <button type="button" onclick="openLogoutModal(event)">Đăng xuất</button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="menu-card" th:if="${nguoiDung.vaiTroCode == 'CAN_BO_DOAN'}">
+            <div class="menu-card-header">CÁN BỘ ĐOÀN</div>
+            <ul class="menu-list">
+                <li><a th:href="@{/duyet-cap-1}">Duyệt đơn</a></li>
+                <li>
+                    <button type="button" onclick="openLogoutModal(event)">Đăng xuất</button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="menu-card" th:if="${nguoiDung.vaiTroCode == 'CAN_BO_CSVC'}">
+            <div class="menu-card-header">CÁN BỘ TRUNG TÂM</div>
+            <ul class="menu-list">
+                <li><a th:href="@{/duyet-cap-2}">Duyệt đơn và bố trí phòng</a></li>
+                <li><a th:href="@{/quan-ly-phong}">Quản lý danh mục phòng</a></li>
+                <li><a th:href="@{/bao-cao}">Báo cáo, thống kê</a></li>
+                <li>
+                    <button type="button" onclick="openLogoutModal(event)">Đăng xuất</button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="status-bar">
+            <span>Xin chào, <strong th:text="${nguoiDung.hoTen}">Người dùng</strong></span>
+            <span class="status-pill" th:text="${nguoiDung.vaiTroDisplay}">VAI TRÒ</span>
+            <span>Tài khoản đang hoạt động</span>
+            <span th:if="${nguoiDung.vaiTroCode == 'NGUOI_MUON' and nguoiDung.donVi != null}">
+                | Đơn vị: <strong th:text="${nguoiDung.donVi.tenCLB}">CLB</strong>
+            </span>
+        </div>
+    </section>
+</main>
+
+<div th:fragment="logoutModal">
+    <div id="logoutModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="logoutTitle">
+        <div class="modal-box">
+            <h2 id="logoutTitle">Xác nhận đăng xuất</h2>
+            <p>Bạn muốn đăng xuất khỏi tài khoản?</p>
+            <div class="modal-actions">
+                <button type="button" class="btn-stay" onclick="closeLogoutModal()">Ở lại</button>
+                <form th:action="@{/logout}" method="post" style="margin: 0;">
+                    <button type="submit" class="btn-confirm-logout">Đăng xuất</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        function openLogoutModal(event) {
+            if (event) event.preventDefault();
+            var modal = document.getElementById('logoutModal');
+            if (modal) modal.classList.add('open');
+        }
+        function closeLogoutModal() {
+            var modal = document.getElementById('logoutModal');
+            if (modal) modal.classList.remove('open');
+        }
+    </script>
+</div>
+
+</body>
+</html>

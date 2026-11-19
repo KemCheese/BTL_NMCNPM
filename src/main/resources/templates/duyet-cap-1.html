@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duyệt đơn cấp 1</title>
+    <style>
+        * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+        body { margin: 0; background: #f4f6f9; color: #1f2937; }
+        .topbar {
+            background: #1c355e;
+            color: #ffffff;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .topbar-brand {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: 700;
+        }
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+        .role-badge {
+            background: #ffffff;
+            color: #1c355e;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .btn-logout-link {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            color: #ffffff;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-logout-link:hover { background: rgba(255, 255, 255, 0.12); }
+
+        .container {
+            max-width: 1260px;
+            margin: 24px auto;
+            padding: 0 16px 32px;
+        }
+        .breadcrumb {
+            margin-bottom: 14px;
+            font-size: 13px;
+        }
+        .breadcrumb a {
+            color: #1c355e;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        .panel {
+            background: #ffffff;
+            border: 1px solid #d9dee6;
+            border-radius: 6px;
+            padding: 22px 24px;
+            margin-bottom: 20px;
+        }
+        .page-title {
+            margin: 0 0 6px;
+            color: #1c355e;
+            font-size: 22px;
+        }
+        .page-subtitle {
+            margin: 0 0 18px;
+            color: #4b5563;
+            font-size: 13px;
+        }
+
+        .alert {
+            padding: 10px 14px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .alert-success {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+        .alert-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            padding: 12px 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+        }
+        .filter-bar label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1c355e;
+        }
+        .filter-bar select {
+            min-width: 240px;
+            padding: 7px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 13px;
+            background: #ffffff;
+        }
+        .btn-primary {
+            display: inline-block;
+            padding: 7px 14px;
+            border: none;
+            border-radius: 4px;
+            background: #1c355e;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            white-space: nowrap;
+            text-align: center;
+        }
+        .btn-primary:hover { background: #152847; }
+        .btn-secondary {
+            display: inline-block;
+            padding: 7px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            background: #ffffff;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            white-space: nowrap;
+            text-align: center;
+        }
+        .btn-secondary:hover { background: #f1f5f9; }
+        .nowrap { white-space: nowrap; }
+
+        .table-wrap { overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th, td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1c355e;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        tr.selected-row { background: #eff6ff; }
+        .badge-status {
+            display: inline-block;
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            background: #fef3c7;
+            color: #92400e;
+            white-space: nowrap;
+        }
+        .empty-state {
+            padding: 24px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+        .detail-header h2 {
+            margin: 0;
+            color: #1c355e;
+            font-size: 18px;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px 24px;
+            margin-bottom: 20px;
+        }
+        .detail-item-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 3px;
+        }
+        .detail-item-value {
+            font-size: 14px;
+            color: #111827;
+        }
+        .detail-block {
+            margin-bottom: 16px;
+        }
+        .detail-block .detail-item-value {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 9px 12px;
+            line-height: 1.5;
+        }
+
+        .decision-section {
+            border-top: 1px solid #e5e7eb;
+            padding-top: 18px;
+            display: grid;
+            grid-template-columns: 1fr 1.6fr;
+            gap: 18px;
+            align-items: start;
+        }
+        @media (max-width: 720px) {
+            .decision-section { grid-template-columns: 1fr; }
+        }
+        .action-box {
+            border: 1px solid #dbe2ea;
+            border-radius: 6px;
+            padding: 16px;
+            background: #f8fafc;
+        }
+        .action-box h3 {
+            margin: 0 0 8px;
+            font-size: 15px;
+            color: #1c355e;
+        }
+        .action-box p {
+            margin: 0 0 12px;
+            font-size: 13px;
+            color: #4b5563;
+        }
+        .btn-approve {
+            padding: 9px 18px;
+            border: none;
+            border-radius: 4px;
+            background: #15803d;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-approve:hover { background: #166534; }
+        .btn-reject {
+            padding: 9px 18px;
+            border: none;
+            border-radius: 4px;
+            background: #b91c1c;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-reject:hover { background: #991b1b; }
+        .reject-form label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 6px;
+        }
+        .reject-form textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 13px;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 1000;
+        }
+        .modal-backdrop.open { display: flex; }
+        .modal-box {
+            width: 100%;
+            max-width: 380px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 22px 24px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        .modal-box h2 { margin: 0 0 10px; font-size: 18px; color: #1f2937; }
+        .modal-box p { margin: 0 0 6px; font-size: 13px; color: #4b5563; }
+        .modal-actions { margin-top: 18px; display: flex; justify-content: center; gap: 10px; }
+        .btn-stay {
+            padding: 8px 16px;
+            border: 1px solid #94a3b8;
+            border-radius: 4px;
+            background: #f8fafc;
+            color: #1c355e;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-confirm-logout {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #1c355e;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<header th:replace="~{trang-chu :: header(${nguoiDung})}"></header>
+
+<main class="container">
+    <div class="breadcrumb">
+        <a th:href="@{/trang-chu}">&larr; Quay lại trang chủ</a>
+    </div>
+
+    <section class="panel">
+        <h1 class="page-title">Duyệt đơn cấp 1</h1>
+        <p class="page-subtitle">Danh sách đơn mượn đang chờ Cán bộ Đoàn duyệt</p>
+
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+        <form class="filter-bar" th:action="@{/duyet-cap-1}" method="get">
+            <label for="tenCLB">Lọc theo CLB:</label>
+            <select id="tenCLB" name="tenCLB">
+                <option value="">-- Tất cả CLB--</option>
+                <option th:each="clb : ${danhSachClb}"
+                        th:value="${clb}"
+                        th:text="${clb}"
+                        th:selected="${tenCLB == clb}"></option>
+            </select>
+            <button type="submit" class="btn-primary">Lọc</button>
+            <a th:href="@{/duyet-cap-1}" class="btn-secondary">Đặt lại</a>
+        </form>
+
+        <div class="empty-state" th:if="${#lists.isEmpty(danhSachDon)}">
+            Không có đơn mượn phòng nào đang chờ duyệt
+        </div>
+
+        <div class="table-wrap" th:if="${!#lists.isEmpty(danhSachDon)}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Ngày tạo</th>
+                    <th>Tên sự kiện</th>
+                    <th>CLB / Đội nhóm</th>
+                    <th>Người mượn</th>
+                    <th>Ngày sử dụng</th>
+                    <th>Khung giờ</th>
+                    <th>Phòng mong muốn</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="don : ${danhSachDon}"
+                    th:classappend="${donChiTiet != null and donChiTiet.id == don.id} ? 'selected-row' : ''">
+                    <td class="nowrap" th:text="${don.maDon}">DM-001</td>
+                    <td class="nowrap" th:text="${#temporals.format(don.ngayTao, 'dd/MM/yyyy')}">17/11/2026</td>
+                    <td th:text="${don.suKien != null ? don.suKien.tenSuKien : ''}">Tên sự kiện</td>
+                    <td th:text="${don.donVi != null ? don.donVi.tenCLB : ''}">CLB</td>
+                    <td>
+                        <div th:text="${don.sinhVien != null ? don.sinhVien.hoTen : ''}">Sinh viên</div>
+                        <small style="color:#64748b" th:text="${don.sinhVien != null ? don.sinhVien.maSinhVien : ''}"></small>
+                    </td>
+                    <td class="nowrap" th:text="${#temporals.format(don.ngaySuDung, 'dd/MM/yyyy')}">25/12/2026</td>
+                    <td class="nowrap" th:text="${#temporals.format(don.gioBatDau, 'HH:mm') + ' - ' + #temporals.format(don.gioKetThuc, 'HH:mm')}">18:00 - 21:00</td>
+                    <td>
+                        <div th:text="${don.loaiPhongMongMuon}">Hội trường</div>
+                        <small style="color:#64748b"
+                               th:text="${don.phongMongMuon != null ? don.phongMongMuon.tenPhong : 'Không chỉ định phòng cụ thể'}"></small>
+                    </td>
+                    <td><span class="badge-status" th:text="${don.trangThai.tenHienThi}">Chờ duyệt cấp 1</span></td>
+                    <td class="nowrap">
+                        <a class="btn-primary"
+                           th:href="@{/duyet-cap-1(selectedId=${don.id}, tenCLB=${#strings.isEmpty(tenCLB) ? null : tenCLB})}">
+                            Xem chi tiết
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel" th:if="${donChiTiet != null}" id="chi-tiet-don">
+        <div class="detail-header">
+            <h2>Chi tiết đơn mượn phòng: <span th:text="${donChiTiet.maDon}">DM-001</span></h2>
+            <span class="badge-status" th:text="${donChiTiet.trangThai.tenHienThi}">Chờ duyệt cấp 1</span>
+        </div>
+
+        <div class="detail-grid">
+            <div>
+                <div class="detail-item-label">CLB / Đội nhóm</div>
+                <div class="detail-item-value"
+                     th:text="${donChiTiet.donVi != null ? donChiTiet.donVi.tenCLB + ' (' + donChiTiet.donVi.maDonVi + ')' : ''}"></div>
+            </div>
+            <div>
+                <div class="detail-item-label">Người nộp đơn</div>
+                <div class="detail-item-value"
+                     th:text="${donChiTiet.sinhVien != null ? donChiTiet.sinhVien.hoTen + ' - ' + donChiTiet.sinhVien.maSinhVien : ''}"></div>
+            </div>
+            <div>
+                <div class="detail-item-label">Ngày tạo đơn</div>
+                <div class="detail-item-value" th:text="${#temporals.format(donChiTiet.ngayTao, 'dd/MM/yyyy')}"></div>
+            </div>
+            <div>
+                <div class="detail-item-label">Ngày &amp; khung giờ sử dụng</div>
+                <div class="detail-item-value"
+                     th:text="${#temporals.format(donChiTiet.ngaySuDung, 'dd/MM/yyyy') + ' (' + #temporals.format(donChiTiet.gioBatDau, 'HH:mm') + ' - ' + #temporals.format(donChiTiet.gioKetThuc, 'HH:mm') + ')'}"></div>
+            </div>
+            <div>
+                <div class="detail-item-label">Tên sự kiện</div>
+                <div class="detail-item-value"
+                     th:text="${donChiTiet.suKien != null ? donChiTiet.suKien.tenSuKien : ''}"></div>
+            </div>
+            <div>
+                <div class="detail-item-label">Số người tham dự</div>
+                <div class="detail-item-value"
+                     th:text="${donChiTiet.suKien != null ? donChiTiet.suKien.soNguoiThamDu : 0}"></div>
+            </div>
+            <div>
+                <div class="detail-item-label">Loại phòng mong muốn</div>
+                <div class="detail-item-value" th:text="${donChiTiet.loaiPhongMongMuon}"></div>
+            </div>
+            <div>
+                <div class="detail-item-label">Phòng mong muốn</div>
+                <div class="detail-item-value"
+                     th:text="${donChiTiet.phongMongMuon != null ? donChiTiet.phongMongMuon.tenPhong + ' (' + donChiTiet.phongMongMuon.maPhong + ')' : 'Không chỉ định'}"></div>
+            </div>
+            <div>
+                <div class="detail-item-label">Thiết bị yêu cầu</div>
+                <div class="detail-item-value"
+                     th:text="${!#strings.isEmpty(donChiTiet.thietBiYeuCau) ? donChiTiet.thietBiYeuCau : 'Không có'}"></div>
+            </div>
+        </div>
+
+        <div class="detail-block">
+            <div class="detail-item-label">Mục đích sự kiện</div>
+            <div class="detail-item-value"
+                 th:text="${donChiTiet.suKien != null ? donChiTiet.suKien.mucDich : ''}"></div>
+        </div>
+
+        <div class="detail-block">
+            <div class="detail-item-label">Nội dung hoạt động</div>
+            <div class="detail-item-value"
+                 th:text="${donChiTiet.suKien != null ? donChiTiet.suKien.noiDung : ''}"></div>
+        </div>
+
+        <div class="decision-section" th:if="${donChiTiet.trangThai.name() == 'ChoDuyetCap1'}">
+            <div class="action-box">
+                <h3>Chấp thuận đơn cấp 1</h3>
+                <p>Xác nhận đồng ý về mặt hoạt động sinh viên và chuyển đơn lên Cán bộ Trung tâm duyệt cấp 2.</p>
+                <form th:action="@{/duyet-cap-1/{id}/chap-thuan(id=${donChiTiet.id})}" method="post">
+                    <input type="hidden" name="tenCLB" th:value="${tenCLB}">
+                    <button type="submit" class="btn-approve">Chấp thuận</button>
+                </form>
+            </div>
+
+            <div class="action-box">
+                <h3>Từ chối đơn cấp 1</h3>
+                <form class="reject-form" th:action="@{/duyet-cap-1/{id}/tu-choi(id=${donChiTiet.id})}" method="post">
+                    <input type="hidden" name="tenCLB" th:value="${tenCLB}">
+                    <label for="lyDo">Lý do từ chối <span style="color:#b91c1c">*</span></label>
+                    <textarea id="lyDo" name="lyDo" rows="3"
+                              placeholder="Nhập lý do từ chối (bắt buộc)..."
+                              th:text="${lyDoDraft}"></textarea>
+                    <button type="submit" class="btn-reject">Từ chối</button>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div th:replace="~{trang-chu :: logoutModal}"></div>
+
+</body>
+</html>

@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý danh mục phòng</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        .topbar {
+            background: #1c355e;
+            color: #ffffff;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .topbar-brand {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .role-badge {
+            background: #ffffff;
+            color: #1c355e;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .btn-logout-link {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            color: #ffffff;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-logout-link:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .container {
+            max-width: 1060px;
+            margin: 24px auto;
+            padding: 0 16px 32px;
+        }
+
+        .panel {
+            background: #ffffff;
+            border: 1px solid #d9dee6;
+            border-radius: 6px;
+            padding: 22px 24px;
+            margin-bottom: 18px;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .page-title {
+            margin: 0;
+            color: #1c355e;
+            font-size: 21px;
+        }
+
+        .btn-back {
+            padding: 7px 14px;
+            border: 1px solid #94a3b8;
+            border-radius: 4px;
+            background: #f8fafc;
+            color: #1c355e;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .btn-back:hover {
+            background: #eef2f7;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .search-form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1 1 360px;
+        }
+
+        .search-form input {
+            flex: 1;
+            min-width: 220px;
+            max-width: 380px;
+            padding: 8px 11px;
+            border: 1px solid #c6cdd8;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .search-form input:focus {
+            outline: none;
+            border-color: #1c355e;
+        }
+
+        .btn-primary {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #1c355e;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            background: #152847;
+        }
+
+        .btn-secondary {
+            padding: 8px 14px;
+            border: 1px solid #1c355e;
+            border-radius: 4px;
+            background: #ffffff;
+            color: #1c355e;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background: #f1f5f9;
+        }
+
+        .msg-error {
+            margin: 0 0 14px;
+            padding: 9px 12px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 4px;
+            color: #b91c1c;
+            font-size: 13px;
+        }
+
+        .msg-success {
+            margin: 0 0 14px;
+            padding: 9px 12px;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 4px;
+            color: #047857;
+            font-size: 13px;
+        }
+
+        .msg-empty {
+            padding: 16px;
+            text-align: center;
+            color: #4b5563;
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+        }
+
+        th,
+        td {
+            padding: 10px 11px;
+            border: 1px solid #d9dee6;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            background: #f1f5f9;
+            color: #1c355e;
+            font-weight: 700;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .badge-active {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
+
+        .badge-inactive {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .section-title {
+            margin: 0 0 14px;
+            color: #1c355e;
+            font-size: 17px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            color: #2f3a4a;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .required-mark {
+            color: #b91c1c;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #c6cdd8;
+            border-radius: 4px;
+            font-size: 14px;
+            background: #ffffff;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1c355e;
+        }
+
+        .form-group input[readonly] {
+            background: #f1f5f9;
+            color: #475569;
+            cursor: not-allowed;
+        }
+
+        .action-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            padding: 4px 10px;
+            border: 1px solid #1c355e;
+            border-radius: 4px;
+            background: #ffffff;
+            color: #1c355e;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-action:hover {
+            background: #eef2f7;
+        }
+
+        .btn-danger-outline {
+            border-color: #b91c1c;
+            color: #b91c1c;
+        }
+
+        .btn-danger-outline:hover {
+            background: #fef2f2;
+        }
+
+        .btn-danger-solid {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #b91c1c;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-danger-solid:hover {
+            background: #991b1b;
+        }
+
+        .modal-box.modal-wide {
+            max-width: 720px;
+            text-align: left;
+            max-height: 88vh;
+            overflow-y: auto;
+        }
+
+        .warn-box {
+            margin: 12px 0;
+            padding: 10px 12px;
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 4px;
+            color: #92400e;
+            font-size: 13px;
+        }
+
+        .mini-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 12.5px;
+        }
+
+        .mini-table th,
+        .mini-table td {
+            padding: 7px 8px;
+            border: 1px solid #d9dee6;
+        }
+
+        .mini-table th {
+            background: #f8fafc;
+            color: #1c355e;
+        }
+
+        .readonly-note {
+            margin: 0 0 12px;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #334155;
+        }
+
+        .form-actions {
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 1000;
+        }
+
+        .modal-backdrop.open {
+            display: flex;
+        }
+
+        .modal-box {
+            width: 100%;
+            max-width: 380px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 22px 24px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-box h2 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            color: #1f2937;
+        }
+
+        .modal-box p {
+            margin: 0 0 6px;
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        .modal-actions {
+            margin-top: 18px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-stay {
+            padding: 8px 16px;
+            border: 1px solid #94a3b8;
+            border-radius: 4px;
+            background: #f8fafc;
+            color: #1c355e;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-confirm-logout {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #1c355e;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        @media (max-width: 680px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header th:replace="~{trang-chu :: header(${nguoiDung})}"></header>
+
+    <main class="container">
+        <section class="panel">
+            <div class="header-row">
+                <h1 class="page-title">Quản lý danh mục phòng</h1>
+                <a class="btn-back" th:href="@{/trang-chu}">Quay lại trang chủ</a>
+            </div>
+
+            <div th:if="${errorMessage}" class="msg-error" th:text="${errorMessage}"></div>
+            <div th:if="${successMessage}" class="msg-success" th:text="${successMessage}"></div>
+
+            <div class="toolbar">
+                <form class="search-form" th:action="@{/quan-ly-phong}" method="get">
+                    <input type="text" name="tuKhoa" th:value="${tuKhoa}"
+                        placeholder="Tìm phòng theo mã, tên, tòa nhà, loại phòng...">
+                    <button type="submit" class="btn-secondary">Tìm</button>
+                    <a class="btn-secondary" th:if="${tuKhoa != null and !#strings.isEmpty(tuKhoa)}"
+                        th:href="@{/quan-ly-phong}">Tất cả</a>
+                </form>
+                <a th:if="${editMode}" class="btn-primary"
+                    th:href="|@{/quan-ly-phong(tuKhoa=${#strings.isEmpty(tuKhoa) ? null : tuKhoa})}#formPhongSection|">Thêm
+                    phòng</a>
+                <button th:unless="${editMode}" type="button" class="btn-primary" onclick="focusAddForm()">Thêm
+                    phòng</button>
+            </div>
+
+            <div th:if="${#lists.isEmpty(phongs)}" class="msg-empty">
+                Không tìm thấy phòng phù hợp.
+            </div>
+
+            <table th:if="${!#lists.isEmpty(phongs)}">
+                <thead>
+                    <tr>
+                        <th style="width: 48px;">TT</th>
+                        <th>Mã phòng</th>
+                        <th>Tên phòng</th>
+                        <th>Loại</th>
+                        <th>Sức chứa</th>
+                        <th>Tình trạng</th>
+                        <th style="width: 190px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="p, stat : ${phongs}">
+                        <td th:text="${stat.count}">1</td>
+                        <td><strong th:text="${p.maPhong}">HT-A2</strong></td>
+                        <td>
+                            <div th:text="${p.tenPhong}">Hội trường A2</div>
+                            <small style="color:#5b6777;"
+                                th:text="'Tòa ' + ${p.toaNha} + ' - Tầng ' + ${p.tang}"></small>
+                        </td>
+                        <td th:text="${p.loaiPhong}">Hội trường</td>
+                        <td th:text="${p.sucChuaToiDa}">300</td>
+                        <td>
+                            <span th:if="${p.dangHoatDong}" class="badge-active" th:text="${p.tinhTrang}">Đang hoạt
+                                động</span>
+                            <span th:unless="${p.dangHoatDong}" class="badge-inactive" th:text="${p.tinhTrang}">Ngưng sử
+                                dụng</span>
+                        </td>
+                        <td>
+                            <div class="action-cell">
+                                <a class="btn-action"
+                                    th:href="|@{/quan-ly-phong(suaId=${p.id}, tuKhoa=${#strings.isEmpty(tuKhoa) ? null : tuKhoa})}#formPhongSection|">Sửa</a>
+                                <a th:if="${p.dangHoatDong}" class="btn-action btn-danger-outline"
+                                    th:href="@{/quan-ly-phong(ngungId=${p.id}, tuKhoa=${#strings.isEmpty(tuKhoa) ? null : tuKhoa})}">Ngưng
+                                    sử dụng</a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="panel" id="formPhongSection">
+            <h2 class="section-title" th:text="${editMode} ? 'Form sửa thông tin phòng' : 'Form thêm phòng mới'">Form
+                thêm phòng mới</h2>
+            <form id="roomForm" th:action="${editMode} ? @{/quan-ly-phong/sua} : @{/quan-ly-phong/them}"
+                th:object="${phongForm}" method="post" novalidate>
+                <input type="hidden" name="tuKhoa" th:value="${tuKhoa}">
+                <input type="hidden" th:if="${editMode}" th:field="*{id}">
+
+                <div th:if="${editMode}" class="readonly-note">
+                    Tình trạng hiện tại:
+                    <strong th:text="*{tinhTrang}">Đang hoạt động</strong>.
+                    Không được đổi mã phòng; phòng đã ngưng sử dụng không thể chuyển lại sang Đang hoạt động.
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="maPhong">Mã phòng <span class="required-mark">*</span></label>
+                        <input type="text" id="maPhong" th:field="*{maPhong}" maxlength="50" placeholder="VD: A2-301"
+                            th:readonly="${editMode}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tenPhong">Tên phòng <span class="required-mark">*</span></label>
+                        <input type="text" id="tenPhong" th:field="*{tenPhong}" maxlength="150"
+                            placeholder="VD: Phòng học A2-301" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loaiPhong">Loại phòng <span class="required-mark">*</span></label>
+                        <select id="loaiPhong" th:field="*{loaiPhong}" required>
+                            <option value="">-- Chọn loại phòng --</option>
+                            <option th:each="loai : ${loaiPhongOptions}" th:value="${loai}" th:text="${loai}">Phòng học
+                                thường</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="toaNha">Tòa nhà <span class="required-mark">*</span></label>
+                        <input type="text" id="toaNha" th:field="*{toaNha}" maxlength="50" placeholder="VD: A2"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tang">Tầng <span class="required-mark">*</span></label>
+                        <input type="number" id="tang" th:field="*{tang}" min="1" placeholder="VD: 3" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sucChuaToiDa">Sức chứa tối đa <span class="required-mark">*</span></label>
+                        <input type="number" id="sucChuaToiDa" th:field="*{sucChuaToiDa}" min="1" placeholder="VD: 60"
+                            required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="trangThietBi">Thiết bị</label>
+                        <input type="text" id="trangThietBi" th:field="*{trangThietBi}"
+                            placeholder="VD: máy chiếu, âm thanh, micro">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="moTa">Mô tả</label>
+                        <textarea id="moTa" th:field="*{moTa}" rows="2"
+                            placeholder="Mô tả thêm về vị trí, đặc điểm phòng"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Lưu</button>
+                    <a th:if="${editMode}" class="btn-secondary"
+                        th:href="@{/quan-ly-phong(tuKhoa=${#strings.isEmpty(tuKhoa) ? null : tuKhoa})}">Hủy sửa</a>
+                    <button th:unless="${editMode}" type="reset" class="btn-secondary">Làm mới</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <div th:if="${ngungTarget != null}" class="modal-backdrop open">
+        <div class="modal-box modal-wide">
+            <h2 th:text="'Xác nhận ngưng sử dụng phòng ' + ${ngungTarget.maPhong}">Xác nhận ngưng sử dụng phòng</h2>
+            <p>
+                Phòng: <strong th:text="${ngungTarget.tenPhong}">Hội trường A2</strong>
+                (<span th:text="'Tòa ' + ${ngungTarget.toaNha} + ' - Tầng ' + ${ngungTarget.tang}"></span>)
+            </p>
+
+            <div th:if="${!#lists.isEmpty(donLienQuanNgung)}">
+                <div class="warn-box">
+                    Cảnh báo: Phòng này hiện còn
+                    <strong th:text="${#lists.size(donLienQuanNgung)}">1</strong>
+                    đơn đã phê duyệt chưa đến ngày sử dụng. Vui lòng cân nhắc trước khi xác nhận ngưng sử dụng.
+                </div>
+                <table class="mini-table">
+                    <thead>
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Sự kiện</th>
+                            <th>Đơn vị</th>
+                            <th>Ngày sử dụng</th>
+                            <th>Khung giờ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="don : ${donLienQuanNgung}">
+                            <td><strong th:text="${don.maDon}">DM-003</strong></td>
+                            <td th:text="${don.tenSuKien}">Sinh hoạt chuyên đề</td>
+                            <td th:text="${don.donVi != null ? don.donVi.tenCLB : '—'}">CLB Tin học</td>
+                            <td th:text="${don.ngaySuDung}">2026-12-30</td>
+                            <td th:text="${don.gioBatDau + ' - ' + don.gioKetThuc}">08:00 - 11:00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p th:if="${#lists.isEmpty(donLienQuanNgung)}" style="margin-top: 10px;">
+                Phòng hiện không có đơn đã phê duyệt nào chưa đến ngày sử dụng. Bạn có chắc muốn chuyển phòng sang
+                trạng thái Ngưng sử dụng?
+            </p>
+
+            <div class="modal-actions" style="justify-content: flex-end;">
+                <a class="btn-stay" style="text-decoration: none;"
+                    th:href="@{/quan-ly-phong(tuKhoa=${#strings.isEmpty(tuKhoa) ? null : tuKhoa})}">Hủy</a>
+                <form th:action="@{/quan-ly-phong/ngung-su-dung}" method="post" style="margin: 0;">
+                    <input type="hidden" name="idPhong" th:value="${ngungTarget.id}">
+                    <input type="hidden" name="tuKhoa" th:value="${tuKhoa}">
+                    <button type="submit" class="btn-danger-solid">Xác nhận ngưng</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{trang-chu :: logoutModal}"></div>
+
+    <script>
+        function focusAddForm() {
+            var section = document.getElementById('formPhongSection');
+            var maPhongInput = document.getElementById('maPhong');
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+            if (maPhongInput) {
+                maPhongInput.focus();
+            }
+        }
+    </script>
+
+</body>
+
+</html>

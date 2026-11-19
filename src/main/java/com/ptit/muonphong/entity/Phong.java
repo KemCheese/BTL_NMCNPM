@@ -1,23 +1,57 @@
 package com.ptit.muonphong.entity;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Phong implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    public static final String TINH_TRANG_HOAT_DONG = "Đang hoạt động";
+    public static final String TINH_TRANG_NGUNG = "Ngưng sử dụng";
+    public static final List<String> LOAI_PHONG_HOP_LE = List.of(
+            "Phòng học thường",
+            "Hội trường",
+            "Phòng máy");
 
     private int id;
     private String maPhong;
     private String tenPhong;
     private String toaNha;
-    private int tang;
-    private int sucChuaToiDa;
+    private Integer tang;
+    private Integer sucChuaToiDa;
     private String loaiPhong;
     private String trangThietBi;
     private String tinhTrang;
     private String moTa;
 
+    public boolean kiemTraHopLe() {
+        if (isBlank(maPhong) || maPhong.trim().length() > 50) {
+            return false;
+        }
+        if (isBlank(tenPhong) || tenPhong.trim().length() > 150) {
+            return false;
+        }
+        if (isBlank(toaNha) || toaNha.trim().length() > 50) {
+            return false;
+        }
+        if (tang == null || tang < 1) {
+            return false;
+        }
+        if (sucChuaToiDa == null || sucChuaToiDa < 1) {
+            return false;
+        }
+        if (isBlank(loaiPhong) || !LOAI_PHONG_HOP_LE.contains(loaiPhong.trim())) {
+            return false;
+        }
+        return true;
+    }
+
     public boolean isDangHoatDong() {
-        return "Đang hoạt động".equalsIgnoreCase(tinhTrang);
+        return TINH_TRANG_HOAT_DONG.equalsIgnoreCase(tinhTrang);
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 
     public int getId() {
@@ -52,19 +86,19 @@ public class Phong implements Serializable {
         this.toaNha = toaNha;
     }
 
-    public int getTang() {
+    public Integer getTang() {
         return tang;
     }
 
-    public void setTang(int tang) {
+    public void setTang(Integer tang) {
         this.tang = tang;
     }
 
-    public int getSucChuaToiDa() {
+    public Integer getSucChuaToiDa() {
         return sucChuaToiDa;
     }
 
-    public void setSucChuaToiDa(int sucChuaToiDa) {
+    public void setSucChuaToiDa(Integer sucChuaToiDa) {
         this.sucChuaToiDa = sucChuaToiDa;
     }
 

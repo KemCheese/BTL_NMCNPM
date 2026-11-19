@@ -19,6 +19,10 @@ public enum TrangThaiDon {
         return tenHienThi;
     }
 
+    public String getMoTa() {
+        return tenHienThi;
+    }
+
     public static TrangThaiDon fromCode(String code) {
         if (code == null || code.isBlank()) {
             return null;

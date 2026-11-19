@@ -19,7 +19,10 @@ public class DonMuonPhong implements Serializable {
     private String tenSuKien;
     private String mucDich;
     private String noiDung;
-    private int soNguoiThamDu;
+    private Integer soNguoiThamDu;
+    private int sinhVienId;
+    private int donViId;
+    private Integer phongMongMuonId;
     private SinhVien sinhVien;
     private DonVi donVi;
     private Phong phongMongMuon;
@@ -120,12 +123,36 @@ public class DonMuonPhong implements Serializable {
         this.noiDung = noiDung;
     }
 
-    public int getSoNguoiThamDu() {
+    public Integer getSoNguoiThamDu() {
         return soNguoiThamDu;
     }
 
-    public void setSoNguoiThamDu(int soNguoiThamDu) {
+    public void setSoNguoiThamDu(Integer soNguoiThamDu) {
         this.soNguoiThamDu = soNguoiThamDu;
+    }
+
+    public int getSinhVienId() {
+        return sinhVienId;
+    }
+
+    public void setSinhVienId(int sinhVienId) {
+        this.sinhVienId = sinhVienId;
+    }
+
+    public int getDonViId() {
+        return donViId;
+    }
+
+    public void setDonViId(int donViId) {
+        this.donViId = donViId;
+    }
+
+    public Integer getPhongMongMuonId() {
+        return phongMongMuonId;
+    }
+
+    public void setPhongMongMuonId(Integer phongMongMuonId) {
+        this.phongMongMuonId = phongMongMuonId;
     }
 
     public SinhVien getSinhVien() {

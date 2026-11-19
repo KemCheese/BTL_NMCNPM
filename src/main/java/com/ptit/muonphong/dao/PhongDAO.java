@@ -5,9 +5,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,6 +96,48 @@ public class PhongDAO {
         String sql = SELECT_COLUMNS + " WHERE id = ?";
         List<Phong> rows = jdbcTemplate.query(sql, new PhongRowMapper(), idPhong);
         return rows.isEmpty() ? null : rows.get(0);
+    }
+
+    public List<Phong> timPhongTrong(LocalDate ngaySuDung, LocalTime gioBatDau, LocalTime gioKetThuc,
+                                     String loaiPhong, Integer sucChua, String thietBi) {
+        if (ngaySuDung == null || gioBatDau == null || gioKetThuc == null || !gioKetThuc.isAfter(gioBatDau)) {
+            return List.of();
+        }
+        StringBuilder sql = new StringBuilder(SELECT_COLUMNS)
+                .append(" WHERE tinhTrang = 'Đang hoạt động'");
+        List<Object> params = new ArrayList<>();
+
+        if (loaiPhong != null && !loaiPhong.isBlank()) {
+            sql.append(" AND loaiPhong = ?");
+            params.add(loaiPhong.trim());
+        }
+        if (sucChua != null && sucChua > 0) {
+            sql.append(" AND sucChuaToiDa >= ?");
+            params.add(sucChua);
+        }
+        if (thietBi != null && !thietBi.isBlank()) {
+            sql.append(" AND LOWER(COALESCE(trangThietBi, '')) LIKE ?");
+            params.add("%" + thietBi.trim().toLowerCase() + "%");
+        }
+
+        sql.append("""
+                 AND NOT EXISTS (
+                     SELECT 1
+                     FROM tblLichSuDungPhong ls
+                     INNER JOIN tblDonMuonPhong d ON ls.donMuonPhongId = d.id
+                     WHERE ls.phongId = tblPhong.id
+                       AND d.ngaySuDung = ?
+                       AND d.trangThai <> 'DaHuy'
+                       AND d.gioBatDau < ?
+                       AND d.gioKetThuc > ?
+                 )
+                 ORDER BY toaNha ASC, tang ASC, maPhong ASC
+                """);
+        params.add(Date.valueOf(ngaySuDung));
+        params.add(Time.valueOf(gioKetThuc));
+        params.add(Time.valueOf(gioBatDau));
+
+        return jdbcTemplate.query(sql.toString(), new PhongRowMapper(), params.toArray());
     }
 
     public boolean capNhatPhong(Phong phong) {

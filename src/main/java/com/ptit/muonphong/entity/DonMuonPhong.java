@@ -2,12 +2,17 @@ package com.ptit.muonphong.entity;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DonMuonPhong implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    public static final LocalTime GIO_MO_CUA = LocalTime.of(7, 0);
+    public static final LocalTime GIO_DONG_CUA = LocalTime.of(22, 0);
+    public static final long SO_GIO_DAT_TRUOC_TOI_THIEU = 48L;
 
     private int id;
     private String maDon;
@@ -33,20 +38,51 @@ public class DonMuonPhong implements Serializable {
     private List<LichSuDon> lichSuDons = new ArrayList<>();
 
     public boolean kiemTraHopLe() {
-        if (ngaySuDung == null || gioBatDau == null || gioKetThuc == null || !gioKetThuc.isAfter(gioBatDau)) {
-            return false;
+        return kiemTraHopLe(LocalDateTime.now());
+    }
+
+    public boolean kiemTraHopLe(LocalDateTime thoiDiemHienTai) {
+        return kiemTraChiTietHopLe(thoiDiemHienTai) == null;
+    }
+
+    public String kiemTraChiTietHopLe(LocalDateTime thoiDiemHienTai) {
+        if (ngaySuDung == null || gioBatDau == null || gioKetThuc == null) {
+            return "Vui lòng nhập đầy đủ ngày sử dụng, giờ bắt đầu và giờ kết thúc.";
+        }
+        if (!gioKetThuc.isAfter(gioBatDau)) {
+            return "Giờ kết thúc phải sau giờ bắt đầu.";
+        }
+        if (gioBatDau.isBefore(GIO_MO_CUA) || gioKetThuc.isAfter(GIO_DONG_CUA)) {
+            return "Khung giờ sử dụng phải nằm trong giờ hoạt động của Học viện (07:00 - 22:00).";
+        }
+        LocalDateTime mocHienTai = thoiDiemHienTai != null ? thoiDiemHienTai : LocalDateTime.now();
+        LocalDateTime thoiDiemBatDau = LocalDateTime.of(ngaySuDung, gioBatDau);
+        if (thoiDiemBatDau.isBefore(mocHienTai.plusHours(SO_GIO_DAT_TRUOC_TOI_THIEU))) {
+            return "Thời gian sử dụng phải đặt trước tối thiểu 48 giờ so với thời điểm gửi đơn.";
         }
         if (loaiPhongMongMuon == null || loaiPhongMongMuon.isBlank()) {
-            return false;
+            return "Vui lòng chọn loại phòng mong muốn.";
         }
         String ten = suKien != null ? suKien.getTenSuKien() : tenSuKien;
         String md = suKien != null ? suKien.getMucDich() : mucDich;
         String nd = suKien != null ? suKien.getNoiDung() : noiDung;
         Integer soNguoi = suKien != null ? suKien.getSoNguoiThamDu() : soNguoiThamDu;
-        return ten != null && !ten.isBlank()
-                && md != null && !md.isBlank()
-                && nd != null && !nd.isBlank()
-                && soNguoi != null && soNguoi > 0;
+        if (ten == null || ten.isBlank()) {
+            return "Vui lòng nhập tên sự kiện.";
+        }
+        if (soNguoi == null || soNguoi <= 0) {
+            return "Số người tham dự phải lớn hơn 0.";
+        }
+        if (md == null || md.isBlank()) {
+            return "Vui lòng nhập mục đích mượn phòng.";
+        }
+        if (nd == null || nd.isBlank()) {
+            return "Vui lòng nhập nội dung hoạt động.";
+        }
+        if ((sinhVien == null && sinhVienId <= 0) || (donVi == null && donViId <= 0)) {
+            return "Không xác định được thông tin sinh viên hoặc đơn vị của người mượn.";
+        }
+        return null;
     }
 
     public int getId() {

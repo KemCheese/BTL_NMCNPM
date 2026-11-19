@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Không có quyền truy cập</title>
+    <style>
+        * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #f4f6f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .card {
+            max-width: 420px;
+            background: #ffffff;
+            border: 1px solid #d9dee6;
+            border-radius: 6px;
+            padding: 26px;
+            text-align: center;
+        }
+        h1 { margin: 0 0 10px; color: #b91c1c; font-size: 20px; }
+        p { margin: 0 0 18px; color: #4b5563; font-size: 14px; }
+        a {
+            display: inline-block;
+            padding: 9px 18px;
+            background: #1c355e;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>Không có quyền truy cập</h1>
+    <p>Tài khoản hiện tại không có quyền thực hiện chức năng này.</p>
+    <a th:href="@{/trang-chu}">Quay lại trang chủ</a>
+</div>
+</body>
+</html>

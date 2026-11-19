@@ -9,13 +9,29 @@ public enum TrangThaiDon {
     DaHuy("Đã hủy"),
     HoanThanh("Hoàn thành");
 
-    private final String moTa;
+    private final String tenHienThi;
 
-    TrangThaiDon(String moTa) {
-        this.moTa = moTa;
+    TrangThaiDon(String tenHienThi) {
+        this.tenHienThi = tenHienThi;
+    }
+
+    public String getTenHienThi() {
+        return tenHienThi;
     }
 
     public String getMoTa() {
-        return moTa;
+        return tenHienThi;
+    }
+
+    public static TrangThaiDon fromCode(String code) {
+        if (code == null || code.isBlank()) {
+            return null;
+        }
+        for (TrangThaiDon item : values()) {
+            if (item.name().equals(code.trim())) {
+                return item;
+            }
+        }
+        return null;
     }
 }

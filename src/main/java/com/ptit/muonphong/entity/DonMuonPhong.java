@@ -23,7 +23,9 @@ public class DonMuonPhong implements Serializable {
     private int sinhVienId;
     private int donViId;
     private Integer phongMongMuonId;
+    private SinhVien sinhVien;
     private DonVi donVi;
+    private Phong phongMongMuon;
 
     public int getId() {
         return id;
@@ -153,11 +155,27 @@ public class DonMuonPhong implements Serializable {
         this.phongMongMuonId = phongMongMuonId;
     }
 
+    public SinhVien getSinhVien() {
+        return sinhVien;
+    }
+
+    public void setSinhVien(SinhVien sinhVien) {
+        this.sinhVien = sinhVien;
+    }
+
     public DonVi getDonVi() {
         return donVi;
     }
 
     public void setDonVi(DonVi donVi) {
         this.donVi = donVi;
+    }
+
+    public Phong getPhongMongMuon() {
+        return phongMongMuon;
+    }
+
+    public void setPhongMongMuon(Phong phongMongMuon) {
+        this.phongMongMuon = phongMongMuon;
     }
 }

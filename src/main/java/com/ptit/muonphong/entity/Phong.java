@@ -47,7 +47,7 @@ public class Phong implements Serializable {
     }
 
     public boolean isDangHoatDong() {
-        return TINH_TRANG_HOAT_DONG.equals(tinhTrang);
+        return TINH_TRANG_HOAT_DONG.equalsIgnoreCase(tinhTrang);
     }
 
     private static boolean isBlank(String value) {

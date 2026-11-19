@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -19,6 +21,27 @@ public class PhongDAO {
 
     public PhongDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    public List<Phong> locPhong(LocalDate ngay, String loaiPhong, Integer sucChua, String tinhTrang) {
+        StringBuilder sql = new StringBuilder(SELECT_COLUMNS).append(" WHERE 1=1");
+        List<Object> params = new ArrayList<>();
+
+        if (loaiPhong != null && !loaiPhong.isBlank()) {
+            sql.append(" AND loaiPhong = ?");
+            params.add(loaiPhong.trim());
+        }
+        if (sucChua != null && sucChua > 0) {
+            sql.append(" AND sucChuaToiDa >= ?");
+            params.add(sucChua);
+        }
+        if (tinhTrang != null && !tinhTrang.isBlank()) {
+            sql.append(" AND tinhTrang = ?");
+            params.add(tinhTrang.trim());
+        }
+
+        sql.append(" ORDER BY toaNha ASC, tang ASC, maPhong ASC");
+        return jdbcTemplate.query(sql.toString(), new PhongRowMapper(), params.toArray());
     }
 
     public List<Phong> timPhong(String tuKhoa) {
@@ -99,6 +122,16 @@ public class PhongDAO {
         String sql = "UPDATE tblPhong SET tinhTrang = ? WHERE id = ?";
         int rows = jdbcTemplate.update(sql, Phong.TINH_TRANG_NGUNG, idPhong);
         return rows > 0;
+    }
+
+    public List<String> findAllLoaiPhong() {
+        String sql = "SELECT DISTINCT loaiPhong FROM tblPhong ORDER BY loaiPhong ASC";
+        return jdbcTemplate.queryForList(sql, String.class);
+    }
+
+    public List<String> findAllTinhTrang() {
+        String sql = "SELECT DISTINCT tinhTrang FROM tblPhong ORDER BY tinhTrang ASC";
+        return jdbcTemplate.queryForList(sql, String.class);
     }
 
     private static class PhongRowMapper implements RowMapper<Phong> {

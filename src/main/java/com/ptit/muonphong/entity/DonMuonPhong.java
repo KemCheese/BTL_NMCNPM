@@ -3,6 +3,8 @@ package com.ptit.muonphong.entity;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DonMuonPhong implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -26,6 +28,26 @@ public class DonMuonPhong implements Serializable {
     private SinhVien sinhVien;
     private DonVi donVi;
     private Phong phongMongMuon;
+    private SuKien suKien;
+    private List<LuotDuyet> luotDuyets = new ArrayList<>();
+    private List<LichSuDon> lichSuDons = new ArrayList<>();
+
+    public boolean kiemTraHopLe() {
+        if (ngaySuDung == null || gioBatDau == null || gioKetThuc == null || !gioKetThuc.isAfter(gioBatDau)) {
+            return false;
+        }
+        if (loaiPhongMongMuon == null || loaiPhongMongMuon.isBlank()) {
+            return false;
+        }
+        String ten = suKien != null ? suKien.getTenSuKien() : tenSuKien;
+        String md = suKien != null ? suKien.getMucDich() : mucDich;
+        String nd = suKien != null ? suKien.getNoiDung() : noiDung;
+        Integer soNguoi = suKien != null ? suKien.getSoNguoiThamDu() : soNguoiThamDu;
+        return ten != null && !ten.isBlank()
+                && md != null && !md.isBlank()
+                && nd != null && !nd.isBlank()
+                && soNguoi != null && soNguoi > 0;
+    }
 
     public int getId() {
         return id;
@@ -177,5 +199,29 @@ public class DonMuonPhong implements Serializable {
 
     public void setPhongMongMuon(Phong phongMongMuon) {
         this.phongMongMuon = phongMongMuon;
+    }
+
+    public SuKien getSuKien() {
+        return suKien;
+    }
+
+    public void setSuKien(SuKien suKien) {
+        this.suKien = suKien;
+    }
+
+    public List<LuotDuyet> getLuotDuyets() {
+        return luotDuyets;
+    }
+
+    public void setLuotDuyets(List<LuotDuyet> luotDuyets) {
+        this.luotDuyets = luotDuyets;
+    }
+
+    public List<LichSuDon> getLichSuDons() {
+        return lichSuDons;
+    }
+
+    public void setLichSuDons(List<LichSuDon> lichSuDons) {
+        this.lichSuDons = lichSuDons;
     }
 }

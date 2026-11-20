@@ -1,13 +1,9 @@
 package com.ptit.muonphong.controller;
 
-import com.ptit.muonphong.entity.DonMuonPhong;
-import com.ptit.muonphong.entity.NguoiDung;
-import com.ptit.muonphong.entity.Phong;
+import com.ptit.muonphong.entity.*;
 import com.ptit.muonphong.service.AuthService;
 import com.ptit.muonphong.service.NopDonService;
-import com.ptit.muonphong.service.NopDonService.KetQuaNopDon;
-import com.ptit.muonphong.service.NopDonService.NopDonCommand;
-import com.ptit.muonphong.service.NopDonService.TimPhongResult;
+import com.ptit.muonphong.service.NopDonService.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,6 +41,7 @@ public class NopDonController {
                 form.setThietBiYeuCau(donCu.getThietBiYeuCau());
                 form.setTenSuKien(donCu.getTenSuKien());
                 form.setSoNguoiThamDu(donCu.getSoNguoiThamDu());
+                form.setSucChuaToiThieu(donCu.getSoNguoiThamDu());
                 form.setMucDich(donCu.getMucDich());
                 form.setNoiDung(donCu.getNoiDung());
                 if (donCu.getPhongMongMuon() != null && donCu.getPhongMongMuon().isDangHoatDong()) {

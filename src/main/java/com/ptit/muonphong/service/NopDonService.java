@@ -1,15 +1,11 @@
 package com.ptit.muonphong.service;
 
-import com.ptit.muonphong.dao.DonMuonPhongDAO;
-import com.ptit.muonphong.dao.LichSuDonDAO;
-import com.ptit.muonphong.dao.PhongDAO;
+import com.ptit.muonphong.dao.*;
 import com.ptit.muonphong.entity.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.List;
 
 @Service
@@ -39,6 +35,9 @@ public class NopDonService {
         }
         DonMuonPhong donCu = donMuonPhongDAO.getChiTiet(idDonCu);
         if (donCu == null || donCu.getSinhVien() == null || donCu.getSinhVien().getId() != sv.getId()) {
+            return null;
+        }
+        if (donCu.getTrangThai() != TrangThaiDon.TuChoiCap1 && donCu.getTrangThai() != TrangThaiDon.TuChoiCap2) {
             return null;
         }
         return donCu;

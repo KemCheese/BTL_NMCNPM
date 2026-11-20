@@ -6,12 +6,10 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Repository
 public class DonMuonPhongDAO {
@@ -93,6 +91,47 @@ public class DonMuonPhongDAO {
         String sql = BASE_DETAIL_SELECT + " WHERE d.id = ?";
         List<DonMuonPhong> rows = jdbcTemplate.query(sql, new DonMuonPhongChiTietRowMapper(), idDon);
         return rows.isEmpty() ? null : rows.get(0);
+    }
+
+    public List<DonMuonPhong> timTheoNguoiMuon(SinhVien sinhVien, TrangThaiDon trangThai) {
+        return timTheoNguoiMuon(sinhVien, null, null, null, trangThai);
+    }
+
+    public List<DonMuonPhong> timTheoNguoiMuon(SinhVien sinhVien, String maDon, LocalDate tuNgay,
+                                               LocalDate denNgay, TrangThaiDon trangThai) {
+        if (sinhVien == null || sinhVien.getId() <= 0) {
+            return Collections.emptyList();
+        }
+        StringBuilder sql = new StringBuilder(BASE_DETAIL_SELECT)
+                .append(" WHERE d.sinhVienId = ?");
+        List<Object> params = new ArrayList<>();
+        params.add(sinhVien.getId());
+
+        if (maDon != null && !maDon.isBlank()) {
+            sql.append(" AND LOWER(d.maDon) LIKE ?");
+            params.add("%" + maDon.trim().toLowerCase() + "%");
+        }
+        if (tuNgay != null) {
+            sql.append(" AND d.ngaySuDung >= ?");
+            params.add(Date.valueOf(tuNgay));
+        }
+        if (denNgay != null) {
+            sql.append(" AND d.ngaySuDung <= ?");
+            params.add(Date.valueOf(denNgay));
+        }
+        if (trangThai != null) {
+            sql.append(" AND d.trangThai = ?");
+            params.add(trangThai.name());
+        }
+        sql.append(" ORDER BY d.ngayTao DESC, d.id DESC");
+        return jdbcTemplate.query(sql.toString(), new DonMuonPhongChiTietRowMapper(), params.toArray());
+    }
+
+    public List<DonMuonPhong> timDonDaDuyetQuaHan(LocalDateTime thoiDiemHienTai) {
+        LocalDateTime moc = thoiDiemHienTai != null ? thoiDiemHienTai : LocalDateTime.now();
+        String sql = BASE_DETAIL_SELECT
+                + " WHERE d.trangThai = 'DaPheDuyet' AND TIMESTAMP(d.ngaySuDung, d.gioKetThuc) <= ?";
+        return jdbcTemplate.query(sql, new DonMuonPhongChiTietRowMapper(), Timestamp.valueOf(moc));
     }
 
     public int capNhatTrangThai(int idDon, TrangThaiDon trangThai) {

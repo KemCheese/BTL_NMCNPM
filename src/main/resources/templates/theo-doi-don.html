@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theo dõi đơn mượn phòng - PTIT</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f6f9;
+            color: #222;
+        }
+        .topbar {
+            background: #1c355e;
+            color: #ffffff;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .topbar-brand {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: 700;
+        }
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+        .role-badge {
+            background: #ffffff;
+            color: #1c355e;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .btn-logout-link {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            color: #ffffff;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-logout-link:hover { background: rgba(255, 255, 255, 0.12); }
+
+        .container {
+            max-width: 1120px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+        .panel {
+            background: #fff;
+            border: 1px solid #d9dee6;
+            border-radius: 6px;
+            padding: 22px 24px;
+            margin-bottom: 20px;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        .page-title {
+            margin: 0 0 4px;
+            color: #1c355e;
+            font-size: 21px;
+        }
+        .page-subtitle {
+            margin: 0;
+            color: #5f6c7b;
+            font-size: 13px;
+        }
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .btn-primary {
+            background: #1c355e;
+            color: #fff;
+        }
+        .btn-primary:hover { background: #142747; }
+        .btn-secondary {
+            background: #fff;
+            color: #1c355e;
+            border-color: #cfd6e0;
+        }
+        .btn-secondary:hover { background: #f1f5f9; }
+        .btn-accent {
+            background: #c8102e;
+            color: #fff;
+        }
+        .btn-accent:hover { background: #a40d25; }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+            gap: 12px;
+            align-items: end;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 14px;
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 5px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 13px;
+            background: #fff;
+        }
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th, td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1c355e;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        tr.selected-row {
+            background: #eff6ff;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 9px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .badge-ChoDuyetCap1, .badge-ChoDuyetCap2 {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .badge-DaPheDuyet {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .badge-TuChoiCap1, .badge-TuChoiCap2 {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .badge-DaHuy {
+            background: #e2e8f0;
+            color: #475569;
+        }
+        .badge-HoanThanh {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .alert {
+            padding: 10px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+        .alert-warning {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+        }
+        .empty-state {
+            text-align: center;
+            color: #64748b;
+            padding: 20px 10px;
+            font-size: 13px;
+        }
+
+        .detail-title {
+            margin: 0 0 14px;
+            color: #1c355e;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 12px 18px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 14px 16px;
+            margin-bottom: 18px;
+            font-size: 13px;
+        }
+        .detail-item-label {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 2px;
+        }
+        .detail-item-value {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .section-heading {
+            margin: 18px 0 10px;
+            color: #1c355e;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 1000;
+        }
+        .modal-backdrop.open { display: flex; }
+        .modal-box {
+            width: 100%;
+            max-width: 380px;
+            background: #ffffff;
+            border-radius: 6px;
+            padding: 22px;
+            border: 1px solid #d9dee6;
+        }
+        .modal-box h2 { margin: 0 0 10px; font-size: 18px; color: #1c355e; }
+        .modal-box p { margin: 0 0 18px; font-size: 14px; color: #374151; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+        .btn-stay {
+            padding: 8px 14px;
+            border: 1px solid #c6cdd8;
+            border-radius: 4px;
+            background: #ffffff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-confirm-logout {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 4px;
+            background: #1c355e;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{trang-chu :: header(${nguoiDung})}"></div>
+
+<div class="container">
+    <div class="panel">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Theo dõi đơn mượn phòng</h1>
+                <p class="page-subtitle">Xem danh sách đơn đã gửi, tiến trình duyệt hai cấp và lịch sử thay đổi trạng thái.</p>
+            </div>
+            <div class="header-actions">
+                <a th:href="@{/trang-chu}" class="btn btn-secondary">Quay lại trang chủ</a>
+            </div>
+        </div>
+
+        <form th:action="@{/theo-doi-don}" method="get" class="filter-grid">
+            <div class="form-group">
+                <label for="maDon">Mã đơn</label>
+                <input type="text" id="maDon" name="maDon" th:value="${maDon}" placeholder="VD: DM-001">
+            </div>
+            <div class="form-group">
+                <label for="tuNgay">Ngày bắt đầu</label>
+                <input type="date" id="tuNgay" name="tuNgay"
+                       th:value="${tuNgay != null ? #temporals.format(tuNgay, 'yyyy-MM-dd') : ''}">
+            </div>
+            <div class="form-group">
+                <label for="denNgay">Ngày kết thúc</label>
+                <input type="date" id="denNgay" name="denNgay"
+                       th:value="${denNgay != null ? #temporals.format(denNgay, 'yyyy-MM-dd') : ''}">
+            </div>
+            <div class="form-group">
+                <label for="trangThai">Trạng thái</label>
+                <select id="trangThai" name="trangThai">
+                    <option value="">Tất cả</option>
+                    <option th:each="tt : ${dsTrangThai}"
+                            th:value="${tt.name()}"
+                            th:text="${tt.tenHienThi}"
+                            th:selected="${trangThai == tt.name()}"></option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-primary">Lọc</button>
+                <a th:href="@{/theo-doi-don}" class="btn btn-secondary">Đặt lại</a>
+            </div>
+        </form>
+
+        <div th:if="${khongTimThayDon}" class="alert alert-warning">
+            Không tìm thấy đơn mượn phòng được chọn hoặc bạn không có quyền xem đơn này.
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>TT</th>
+                    <th>Mã đơn</th>
+                    <th>Ngày tạo</th>
+                    <th>Ngày sử dụng</th>
+                    <th>Phòng bố trí</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(dsDon)}">
+                    <td colspan="7" class="empty-state">Không có đơn mượn phòng nào phù hợp với điều kiện lọc.</td>
+                </tr>
+                <tr th:each="don, stat : ${dsDon}"
+                    th:classappend="${donId != null and donId == don.id} ? 'selected-row' : ''">
+                    <td th:text="${stat.count}">1</td>
+                    <td><strong th:text="${don.maDon}">DM-001</strong></td>
+                    <td th:text="${don.ngayTao != null ? #temporals.format(don.ngayTao, 'dd/MM/yyyy') : '—'}">01/01/2026</td>
+                    <td>
+                        <span th:text="${don.ngaySuDung != null ? #temporals.format(don.ngaySuDung, 'dd/MM/yyyy') : '—'}">10/01/2026</span>
+                        <div style="color:#64748b;font-size:12px;"
+                             th:if="${don.gioBatDau != null and don.gioKetThuc != null}"
+                             th:text="${#temporals.format(don.gioBatDau, 'HH:mm') + ' - ' + #temporals.format(don.gioKetThuc, 'HH:mm')}">08:00 - 10:00</div>
+                    </td>
+                    <td>
+                        <span th:if="${phongBoTriMap.containsKey(don.id)}"
+                              th:text="${phongBoTriMap.get(don.id).maPhong + ' - ' + phongBoTriMap.get(don.id).tenPhong}">A2-201</span>
+                        <span th:unless="${phongBoTriMap.containsKey(don.id)}" style="color:#64748b;">Chưa bố trí</span>
+                    </td>
+                    <td>
+                        <span th:if="${don.trangThai != null}"
+                              th:class="'badge badge-' + ${don.trangThai.name()}"
+                              th:text="${don.trangThai.tenHienThi}">Chờ duyệt cấp 1</span>
+                    </td>
+                    <td>
+                        <a class="btn btn-secondary btn-sm"
+                           th:href="@{/theo-doi-don(maDon=${maDon}, tuNgay=${tuNgay != null ? #temporals.format(tuNgay, 'yyyy-MM-dd') : null}, denNgay=${denNgay != null ? #temporals.format(denNgay, 'yyyy-MM-dd') : null}, trangThai=${trangThai}, donId=${don.id})} + '#chi-tiet-don'">
+                            Xem
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="chi-tiet-don" class="panel" th:if="${chiTietDon != null}">
+        <div class="detail-title">
+            <span th:text="'Chi tiết đơn ' + ${chiTietDon.don.maDon}">Chi tiết đơn DM-001</span>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <span th:if="${chiTietDon.don.trangThai != null}"
+                      th:class="'badge badge-' + ${chiTietDon.don.trangThai.name()}"
+                      th:text="${chiTietDon.don.trangThai.tenHienThi}">Chờ duyệt cấp 1</span>
+                <a th:if="${chiTietDon.coTheTaoLai}"
+                   th:href="@{/nop-don(donCuId=${chiTietDon.don.id})}"
+                   class="btn btn-accent btn-sm">
+                    Tạo đơn mới từ đơn này
+                </a>
+            </div>
+        </div>
+
+        <div class="detail-grid">
+            <div>
+                <div class="detail-item-label">Sự kiện</div>
+                <div class="detail-item-value" th:text="${chiTietDon.don.tenSuKien}">Hội thảo</div>
+            </div>
+            <div>
+                <div class="detail-item-label">Đơn vị / CLB</div>
+                <div class="detail-item-value"
+                     th:text="${chiTietDon.don.donVi != null ? chiTietDon.don.donVi.tenCLB : '—'}">CLB</div>
+            </div>
+            <div>
+                <div class="detail-item-label">Ngày &amp; khung giờ sử dụng</div>
+                <div class="detail-item-value"
+                     th:text="${(chiTietDon.don.ngaySuDung != null ? #temporals.format(chiTietDon.don.ngaySuDung, 'dd/MM/yyyy') : '—') + ' (' + (chiTietDon.don.gioBatDau != null ? #temporals.format(chiTietDon.don.gioBatDau, 'HH:mm') : '') + ' - ' + (chiTietDon.don.gioKetThuc != null ? #temporals.format(chiTietDon.don.gioKetThuc, 'HH:mm') : '') + ')'}">10/01/2026</div>
+            </div>
+            <div>
+                <div class="detail-item-label">Số người tham dự</div>
+                <div class="detail-item-value"
+                     th:text="${chiTietDon.don.soNguoiThamDu != null ? chiTietDon.don.soNguoiThamDu + ' người' : '—'}">50 người</div>
+            </div>
+            <div>
+                <div class="detail-item-label">Loại phòng mong muốn</div>
+                <div class="detail-item-value" th:text="${chiTietDon.don.loaiPhongMongMuon}">Phòng học thường</div>
+            </div>
+            <div>
+                <div class="detail-item-label">Phòng mong muốn</div>
+                <div class="detail-item-value"
+                     th:text="${chiTietDon.don.phongMongMuon != null ? chiTietDon.don.phongMongMuon.maPhong + ' - ' + chiTietDon.don.phongMongMuon.tenPhong : 'Trung tâm tự bố trí'}">A2-201</div>
+            </div>
+            <div>
+                <div class="detail-item-label">Phòng bố trí</div>
+                <div class="detail-item-value"
+                     th:text="${chiTietDon.phongBoTri != null ? chiTietDon.phongBoTri.maPhong + ' - ' + chiTietDon.phongBoTri.tenPhong : 'Chưa bố trí'}">Chưa bố trí</div>
+            </div>
+            <div>
+                <div class="detail-item-label">Thiết bị yêu cầu</div>
+                <div class="detail-item-value"
+                     th:text="${chiTietDon.don.thietBiYeuCau != null and !chiTietDon.don.thietBiYeuCau.isBlank() ? chiTietDon.don.thietBiYeuCau : 'Không có'}">Máy chiếu</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+                <div class="detail-item-label">Mục đích</div>
+                <div class="detail-item-value" th:text="${chiTietDon.don.mucDich}">Mục đích</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+                <div class="detail-item-label">Nội dung hoạt động</div>
+                <div class="detail-item-value" th:text="${chiTietDon.don.noiDung}">Nội dung</div>
+            </div>
+        </div>
+
+        <h3 class="section-heading">Tiến trình hai cấp duyệt</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Cấp duyệt</th>
+                    <th>Người duyệt</th>
+                    <th>Kết quả</th>
+                    <th>Lý do</th>
+                    <th>Thời điểm</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(chiTietDon.dsLuotDuyet)}">
+                    <td colspan="5" class="empty-state">Chưa có lượt duyệt nào cho đơn này.</td>
+                </tr>
+                <tr th:each="ld : ${chiTietDon.dsLuotDuyet}">
+                    <td th:text="'Cấp ' + ${ld.capDuyet}">Cấp 1</td>
+                    <td th:text="${ld.nguoiDuyet != null ? ld.nguoiDuyet.hoTen : '—'}">Cán bộ</td>
+                    <td th:text="${ld.ketQua}">Phê duyệt</td>
+                    <td th:text="${ld.lyDo != null and !ld.lyDo.isBlank() ? ld.lyDo : '—'}">—</td>
+                    <td th:text="${ld.thoiDiem != null ? #temporals.format(ld.thoiDiem, 'dd/MM/yyyy HH:mm') : '—'}">01/01/2026 10:00</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3 class="section-heading">Lịch sử thay đổi trạng thái</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Thời điểm</th>
+                    <th>Trạng thái cũ</th>
+                    <th>Trạng thái mới</th>
+                    <th>Người thực hiện</th>
+                    <th>Ghi chú</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(chiTietDon.dsLichSuDon)}">
+                    <td colspan="5" class="empty-state">Chưa có lịch sử thay đổi trạng thái.</td>
+                </tr>
+                <tr th:each="ls : ${chiTietDon.dsLichSuDon}">
+                    <td th:text="${ls.thoiDiem != null ? #temporals.format(ls.thoiDiem, 'dd/MM/yyyy HH:mm') : '—'}">01/01/2026 10:00</td>
+                    <td th:text="${ls.trangThaiCu != null ? ls.trangThaiCu.tenHienThi : 'Khởi tạo'}">Khởi tạo</td>
+                    <td th:text="${ls.trangThaiMoi != null ? ls.trangThaiMoi.tenHienThi : '—'}">Chờ duyệt cấp 1</td>
+                    <td th:text="${ls.nguoiThucHien != null ? ls.nguoiThucHien.hoTen : '—'}">Sinh viên</td>
+                    <td th:text="${ls.ghiChu != null and !ls.ghiChu.isBlank() ? ls.ghiChu : '—'}">—</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{trang-chu :: logoutModal}"></div>
+
+</body>
+</html>

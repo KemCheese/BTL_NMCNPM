@@ -6,7 +6,10 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class LichSuDungPhongDAO {
@@ -36,6 +39,42 @@ public class LichSuDungPhongDAO {
                 ORDER BY d.gioBatDau ASC, ls.id ASC
                 """;
         return jdbcTemplate.query(sql, new LichSuDungPhongRowMapper(phong), phong.getId(), Date.valueOf(ngay));
+    }
+
+    public Phong getPhongBoTriTheoDon(int idDon) {
+        if (idDon <= 0) {
+            return null;
+        }
+        return getPhongBoTriTheoCacDon(List.of(idDon)).get(idDon);
+    }
+
+    public Map<Integer, Phong> getPhongBoTriTheoCacDon(List<Integer> donIds) {
+        if (donIds == null || donIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        String placeholders = String.join(",", Collections.nCopies(donIds.size(), "?"));
+        String sql = "SELECT ls.donMuonPhongId, p.id AS pId, p.maPhong, p.tenPhong, p.toaNha, p.tang, "
+                + "p.sucChuaToiDa, p.loaiPhong, p.trangThietBi, p.tinhTrang, p.moTa AS pMoTa "
+                + "FROM tblLichSuDungPhong ls "
+                + "INNER JOIN tblPhong p ON ls.phongId = p.id "
+                + "WHERE ls.donMuonPhongId IN (" + placeholders + ")";
+        Map<Integer, Phong> result = new LinkedHashMap<>();
+        jdbcTemplate.query(sql, rs -> {
+            int donId = rs.getInt("donMuonPhongId");
+            Phong phong = new Phong();
+            phong.setId(rs.getInt("pId"));
+            phong.setMaPhong(rs.getString("maPhong"));
+            phong.setTenPhong(rs.getString("tenPhong"));
+            phong.setToaNha(rs.getString("toaNha"));
+            phong.setTang(rs.getInt("tang"));
+            phong.setSucChuaToiDa(rs.getInt("sucChuaToiDa"));
+            phong.setLoaiPhong(rs.getString("loaiPhong"));
+            phong.setTrangThietBi(rs.getString("trangThietBi"));
+            phong.setTinhTrang(rs.getString("tinhTrang"));
+            phong.setMoTa(rs.getString("pMoTa"));
+            result.putIfAbsent(donId, phong);
+        }, donIds.toArray());
+        return result;
     }
 
     private static class LichSuDungPhongRowMapper implements RowMapper<LichSuDungPhong> {

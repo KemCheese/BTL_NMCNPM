@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -93,6 +94,31 @@ public class DonMuonPhongDAO {
         String sql = BASE_DETAIL_SELECT + " WHERE d.id = ?";
         List<DonMuonPhong> rows = jdbcTemplate.query(sql, new DonMuonPhongChiTietRowMapper(), idDon);
         return rows.isEmpty() ? null : rows.get(0);
+    }
+
+    public DonMuonPhong lockDonById(int idDon) {
+        String sql = BASE_DETAIL_SELECT + " WHERE d.id = ? FOR UPDATE";
+        List<DonMuonPhong> rows = jdbcTemplate.query(sql, new DonMuonPhongChiTietRowMapper(), idDon);
+        return rows.isEmpty() ? null : rows.get(0);
+    }
+
+    public List<DonMuonPhong> timDonDaDuyetChuaSuDung(LocalDate ngayHienTai, LocalTime gioHienTai) {
+        if (ngayHienTai == null || gioHienTai == null) {
+            return List.of();
+        }
+        String sql = BASE_DETAIL_SELECT
+                + " WHERE d.trangThai = ? AND (d.ngaySuDung > ? OR (d.ngaySuDung = ? AND d.gioBatDau > ?))"
+                + " ORDER BY d.ngaySuDung ASC, d.gioBatDau ASC, d.id ASC";
+        Date ngaySql = Date.valueOf(ngayHienTai);
+        Time gioSql = Time.valueOf(gioHienTai);
+        return jdbcTemplate.query(
+                sql,
+                new DonMuonPhongChiTietRowMapper(),
+                TrangThaiDon.DaPheDuyet.name(),
+                ngaySql,
+                ngaySql,
+                gioSql
+        );
     }
 
     public List<DonMuonPhong> timTheoNguoiMuon(SinhVien sinhVien, TrangThaiDon trangThai) {

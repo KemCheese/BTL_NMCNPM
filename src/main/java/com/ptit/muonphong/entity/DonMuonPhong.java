@@ -36,6 +36,7 @@ public class DonMuonPhong implements Serializable {
     private SuKien suKien;
     private List<LuotDuyet> luotDuyets = new ArrayList<>();
     private List<LichSuDon> lichSuDons = new ArrayList<>();
+    private LichSuDungPhong lichSuDungPhong;
 
     public boolean kiemTraHopLe() {
         return kiemTraHopLe(LocalDateTime.now());
@@ -259,5 +260,13 @@ public class DonMuonPhong implements Serializable {
 
     public void setLichSuDons(List<LichSuDon> lichSuDons) {
         this.lichSuDons = lichSuDons;
+    }
+
+    public LichSuDungPhong getLichSuDungPhong() {
+        return lichSuDungPhong;
+    }
+
+    public void setLichSuDungPhong(LichSuDungPhong lichSuDungPhong) {
+        this.lichSuDungPhong = lichSuDungPhong;
     }
 }

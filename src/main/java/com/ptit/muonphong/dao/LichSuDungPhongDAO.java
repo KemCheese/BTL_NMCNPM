@@ -77,6 +77,24 @@ public class LichSuDungPhongDAO {
         return result;
     }
 
+    public int themKhungGio(LichSuDungPhong lichSuDungPhong) {
+        if (lichSuDungPhong == null
+                || lichSuDungPhong.getPhong() == null || lichSuDungPhong.getPhong().getId() <= 0
+                || lichSuDungPhong.getDonMuonPhong() == null || lichSuDungPhong.getDonMuonPhong().getId() <= 0) {
+            throw new IllegalArgumentException("Thông tin lịch sử dụng phòng không hợp lệ.");
+        }
+        String sql = "INSERT INTO tblLichSuDungPhong (phongId, donMuonPhongId) VALUES (?, ?)";
+        return jdbcTemplate.update(sql, lichSuDungPhong.getPhong().getId(), lichSuDungPhong.getDonMuonPhong().getId());
+    }
+
+    public int doiPhongChoDon(int idDon, int idPhongMoi) {
+        if (idDon <= 0 || idPhongMoi <= 0) {
+            throw new IllegalArgumentException("Thông tin đổi phòng không hợp lệ.");
+        }
+        String sql = "UPDATE tblLichSuDungPhong SET phongId = ? WHERE donMuonPhongId = ?";
+        return jdbcTemplate.update(sql, idPhongMoi, idDon);
+    }
+
     private static class LichSuDungPhongRowMapper implements RowMapper<LichSuDungPhong> {
         private final Phong phong;
 

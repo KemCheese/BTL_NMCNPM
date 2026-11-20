@@ -98,6 +98,12 @@ public class PhongDAO {
         return rows.isEmpty() ? null : rows.get(0);
     }
 
+    public Phong lockPhongById(int idPhong) {
+        String sql = SELECT_COLUMNS + " WHERE id = ? FOR UPDATE";
+        List<Phong> rows = jdbcTemplate.query(sql, new PhongRowMapper(), idPhong);
+        return rows.isEmpty() ? null : rows.get(0);
+    }
+
     public List<Phong> timPhongTrong(LocalDate ngaySuDung, LocalTime gioBatDau, LocalTime gioKetThuc,
                                      String loaiPhong, Integer sucChua, String thietBi) {
         if (ngaySuDung == null || gioBatDau == null || gioKetThuc == null || !gioKetThuc.isAfter(gioBatDau)) {

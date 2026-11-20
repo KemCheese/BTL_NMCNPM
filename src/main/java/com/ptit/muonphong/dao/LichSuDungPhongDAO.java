@@ -1,6 +1,7 @@
 package com.ptit.muonphong.dao;
 
 import com.ptit.muonphong.entity.*;
+import com.ptit.muonphong.service.BaoCaoService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -61,18 +62,7 @@ public class LichSuDungPhongDAO {
         Map<Integer, Phong> result = new LinkedHashMap<>();
         jdbcTemplate.query(sql, rs -> {
             int donId = rs.getInt("donMuonPhongId");
-            Phong phong = new Phong();
-            phong.setId(rs.getInt("pId"));
-            phong.setMaPhong(rs.getString("maPhong"));
-            phong.setTenPhong(rs.getString("tenPhong"));
-            phong.setToaNha(rs.getString("toaNha"));
-            phong.setTang(rs.getInt("tang"));
-            phong.setSucChuaToiDa(rs.getInt("sucChuaToiDa"));
-            phong.setLoaiPhong(rs.getString("loaiPhong"));
-            phong.setTrangThietBi(rs.getString("trangThietBi"));
-            phong.setTinhTrang(rs.getString("tinhTrang"));
-            phong.setMoTa(rs.getString("pMoTa"));
-            result.putIfAbsent(donId, phong);
+            result.putIfAbsent(donId, mapPhongColumns(rs));
         }, donIds.toArray());
         return result;
     }
@@ -93,6 +83,51 @@ public class LichSuDungPhongDAO {
         }
         String sql = "UPDATE tblLichSuDungPhong SET phongId = ? WHERE donMuonPhongId = ?";
         return jdbcTemplate.update(sql, idPhongMoi, idDon);
+    }
+
+    public List<ThongKeDong> thongKe(String tieuChi, LocalDate tuNgay, LocalDate denNgay) {
+        if (!BaoCaoService.laTieuChiTheoPhongHopLe(tieuChi)
+                || tuNgay == null
+                || denNgay == null
+                || denNgay.isBefore(tuNgay)) {
+            return List.of();
+        }
+        String sql = """
+                SELECT p.id AS pId, p.maPhong, p.tenPhong, p.toaNha, p.tang,
+                       p.sucChuaToiDa, p.loaiPhong, p.trangThietBi, p.tinhTrang, p.moTa AS pMoTa,
+                       COUNT(DISTINCT d.id) AS soLuot,
+                       COALESCE(SUM(TIMESTAMPDIFF(MINUTE, d.gioBatDau, d.gioKetThuc)) / 60.0, 0) AS tongGio
+                FROM tblLichSuDungPhong ls
+                INNER JOIN tblPhong p ON ls.phongId = p.id
+                INNER JOIN tblDonMuonPhong d ON ls.donMuonPhongId = d.id
+                WHERE d.trangThai = ?
+                  AND d.ngaySuDung BETWEEN ? AND ?
+                GROUP BY p.id, p.maPhong, p.tenPhong, p.toaNha, p.tang,
+                         p.sucChuaToiDa, p.loaiPhong, p.trangThietBi, p.tinhTrang, p.moTa
+                ORDER BY tongGio DESC, soLuot DESC, p.maPhong ASC
+                """;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            Phong phong = mapPhongColumns(rs);
+            int soLuot = rs.getInt("soLuot");
+            double tongGio = BaoCaoService.lamTronHaiChuSo(rs.getDouble("tongGio"));
+            double tyLe = BaoCaoService.tinhTyLeSuDung(tongGio, tuNgay, denNgay);
+            return new ThongKeDong(phong, soLuot, tongGio, tyLe);
+        }, TrangThaiDon.DaPheDuyet.name(), Date.valueOf(tuNgay), Date.valueOf(denNgay));
+    }
+
+    private static Phong mapPhongColumns(ResultSet rs) throws SQLException {
+        Phong phong = new Phong();
+        phong.setId(rs.getInt("pId"));
+        phong.setMaPhong(rs.getString("maPhong"));
+        phong.setTenPhong(rs.getString("tenPhong"));
+        phong.setToaNha(rs.getString("toaNha"));
+        phong.setTang(rs.getInt("tang"));
+        phong.setSucChuaToiDa(rs.getInt("sucChuaToiDa"));
+        phong.setLoaiPhong(rs.getString("loaiPhong"));
+        phong.setTrangThietBi(rs.getString("trangThietBi"));
+        phong.setTinhTrang(rs.getString("tinhTrang"));
+        phong.setMoTa(rs.getString("pMoTa"));
+        return phong;
     }
 
     private static class LichSuDungPhongRowMapper implements RowMapper<LichSuDungPhong> {

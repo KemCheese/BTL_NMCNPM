@@ -211,6 +211,11 @@
             font-size: 13px;
             margin-bottom: 16px;
         }
+        .alert-success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
         .alert-warning {
             background: #fff7ed;
             border: 1px solid #fed7aa;
@@ -349,6 +354,14 @@
             </div>
         </form>
 
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}">
+            Cập nhật đơn thành công.
+        </div>
+
+        <div th:if="${errorMessage}" class="alert alert-warning" th:text="${errorMessage}">
+            Không thể thực hiện thao tác.
+        </div>
+
         <div th:if="${khongTimThayDon}" class="alert alert-warning">
             Không tìm thấy đơn mượn phòng được chọn hoặc bạn không có quyền xem đơn này.
         </div>
@@ -392,10 +405,17 @@
                               th:text="${don.trangThai.tenHienThi}">Chờ duyệt cấp 1</span>
                     </td>
                     <td>
-                        <a class="btn btn-secondary btn-sm"
-                           th:href="@{/theo-doi-don(maDon=${maDon}, tuNgay=${tuNgay != null ? #temporals.format(tuNgay, 'yyyy-MM-dd') : null}, denNgay=${denNgay != null ? #temporals.format(denNgay, 'yyyy-MM-dd') : null}, trangThai=${trangThai}, donId=${don.id})} + '#chi-tiet-don'">
-                            Xem
-                        </a>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                            <a class="btn btn-secondary btn-sm"
+                               th:href="@{/theo-doi-don(maDon=${maDon}, tuNgay=${tuNgay != null ? #temporals.format(tuNgay, 'yyyy-MM-dd') : null}, denNgay=${denNgay != null ? #temporals.format(denNgay, 'yyyy-MM-dd') : null}, trangThai=${trangThai}, donId=${don.id})} + '#chi-tiet-don'">
+                                Xem
+                            </a>
+                            <a th:if="${don.trangThai != null and don.trangThai.name() == 'ChoDuyetCap1'}"
+                               class="btn btn-primary btn-sm"
+                               th:href="@{/theo-doi-don/{id}/sua(id=${don.id})}">
+                                Sửa
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 </tbody>
@@ -410,6 +430,11 @@
                 <span th:if="${chiTietDon.don.trangThai != null}"
                       th:class="'badge badge-' + ${chiTietDon.don.trangThai.name()}"
                       th:text="${chiTietDon.don.trangThai.tenHienThi}">Chờ duyệt cấp 1</span>
+                <a th:if="${chiTietDon.don.trangThai != null and chiTietDon.don.trangThai.name() == 'ChoDuyetCap1'}"
+                   th:href="@{/theo-doi-don/{id}/sua(id=${chiTietDon.don.id})}"
+                   class="btn btn-primary btn-sm">
+                    Sửa
+                </a>
                 <a th:if="${chiTietDon.coTheTaoLai}"
                    th:href="@{/nop-don(donCuId=${chiTietDon.don.id})}"
                    class="btn btn-accent btn-sm">

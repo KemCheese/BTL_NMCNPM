@@ -251,8 +251,7 @@ public class DonMuonPhongDAO {
                 ? don.getSinhVien().getId() : don.getSinhVienId();
         int dvId = don.getDonVi() != null && don.getDonVi().getId() > 0
                 ? don.getDonVi().getId() : don.getDonViId();
-        Integer phongId = don.getPhongMongMuon() != null && don.getPhongMongMuon().getId() > 0
-                ? don.getPhongMongMuon().getId() : don.getPhongMongMuonId();
+        Integer phongId = resolvePhongMongMuonId(don);
         don.setSinhVienId(svId);
         don.setDonViId(dvId);
         don.setPhongMongMuonId(phongId);
@@ -300,6 +299,50 @@ public class DonMuonPhongDAO {
             don.setId(generatedId.intValue());
         }
         return don;
+    }
+
+    public int suaDon(DonMuonPhong don) {
+        if (don == null || don.getId() <= 0) {
+            throw new IllegalArgumentException("Đơn mượn phòng không hợp lệ để cập nhật.");
+        }
+        Integer phongId = resolvePhongMongMuonId(don);
+        don.setPhongMongMuonId(phongId);
+
+        String sql = """
+                UPDATE tblDonMuonPhong
+                SET ngaySuDung = ?,
+                    gioBatDau = ?,
+                    gioKetThuc = ?,
+                    loaiPhongMongMuon = ?,
+                    thietBiYeuCau = ?,
+                    tenSuKien = ?,
+                    mucDich = ?,
+                    noiDung = ?,
+                    soNguoiThamDu = ?,
+                    phongMongMuonId = ?
+                WHERE id = ?
+                  AND trangThai = 'ChoDuyetCap1'
+                """;
+        return jdbcTemplate.update(sql,
+                Date.valueOf(don.getNgaySuDung()),
+                Time.valueOf(don.getGioBatDau()),
+                Time.valueOf(don.getGioKetThuc()),
+                don.getLoaiPhongMongMuon().trim(),
+                don.getThietBiYeuCau() != null && !don.getThietBiYeuCau().isBlank()
+                        ? don.getThietBiYeuCau().trim() : null,
+                don.getTenSuKien().trim(),
+                don.getMucDich().trim(),
+                don.getNoiDung().trim(),
+                don.getSoNguoiThamDu() != null ? don.getSoNguoiThamDu() : 0,
+                phongId,
+                don.getId());
+    }
+
+    private Integer resolvePhongMongMuonId(DonMuonPhong don) {
+        if (don.getPhongMongMuon() != null && don.getPhongMongMuon().getId() > 0) {
+            return Integer.valueOf(don.getPhongMongMuon().getId());
+        }
+        return don.getPhongMongMuonId();
     }
 
     private static DonMuonPhong mapCoreColumns(ResultSet rs) throws SQLException {

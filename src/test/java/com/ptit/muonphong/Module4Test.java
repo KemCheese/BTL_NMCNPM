@@ -138,7 +138,6 @@ class Module4Test {
                 .andExpect(content().string(containsString("Hội trường A2")))
                 .andExpect(content().string(containsString("6.00 giờ")))
                 .andExpect(content().string(containsString("1.29%")))
-                .andExpect(content().string(containsString("15 giờ/ngày")))
                 .andExpect(content().string(containsString("Biểu đồ tổng giờ sử dụng theo phòng")))
                 .andExpect(content().string(containsString("height: 100.00%")));
     }
@@ -163,7 +162,6 @@ class Module4Test {
                 .with(user(new CustomUserDetails(createCanBoCSVC()))))
                 .andExpect(status().isOk())
                 .andExpect(view().name("bao-cao"))
-                .andExpect(content().string(containsString("Số ngày trong kỳ: 31 ngày")))
                 .andExpect(content().string(containsString("HT-B1")))
                 .andExpect(content().string(containsString("9.00h")))
                 .andExpect(content().string(containsString("3.00h")))

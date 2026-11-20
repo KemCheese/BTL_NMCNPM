@@ -165,24 +165,6 @@
             background: #152847;
         }
 
-        .meta-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-
-        .meta-chip {
-            display: inline-block;
-            padding: 5px 11px;
-            border-radius: 999px;
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            color: #1e3a8a;
-            font-size: 12.5px;
-            font-weight: 600;
-        }
-
         .msg-error {
             margin: 0 0 14px;
             padding: 10px 12px;
@@ -521,8 +503,7 @@
                         </div>
                     </div>
                     <a class="btn-back"
-                        th:href="@{/bao-cao(tieuChi=${tieuChi}, tuNgay=${tuNgay}, denNgay=${denNgay})}">Đóng chi
-                        tiết</a>
+                        th:href="@{/bao-cao(tieuChi=${tieuChi}, tuNgay=${tuNgay}, denNgay=${denNgay})}">Đóng chi tiết</a>
                 </div>
 
                 <div th:if="${#lists.isEmpty(chiTietBaoCao.dsDon)}" class="msg-empty">

@@ -86,6 +86,27 @@ public class DonMuonPhong implements Serializable {
         return null;
     }
 
+    public boolean coTheHuy() {
+        return coTheHuy(LocalDateTime.now());
+    }
+
+    public boolean coTheHuy(LocalDateTime thoiDiemHienTai) {
+        if (trangThai == null) {
+            return false;
+        }
+        if (trangThai == TrangThaiDon.ChoDuyetCap1 || trangThai == TrangThaiDon.ChoDuyetCap2) {
+            return true;
+        }
+        if (trangThai == TrangThaiDon.DaPheDuyet) {
+            if (ngaySuDung == null || gioBatDau == null) {
+                return false;
+            }
+            LocalDateTime mocHienTai = thoiDiemHienTai != null ? thoiDiemHienTai : LocalDateTime.now();
+            return LocalDateTime.of(ngaySuDung, gioBatDau).isAfter(mocHienTai);
+        }
+        return false;
+    }
+
     public int getId() {
         return id;
     }

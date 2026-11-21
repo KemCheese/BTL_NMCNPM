@@ -85,6 +85,14 @@ public class LichSuDungPhongDAO {
         return jdbcTemplate.update(sql, idPhongMoi, idDon);
     }
 
+    public int giaiPhongKhungGio(int idDon) {
+        if (idDon <= 0) {
+            return 0;
+        }
+        String sql = "DELETE FROM tblLichSuDungPhong WHERE donMuonPhongId = ?";
+        return jdbcTemplate.update(sql, idDon);
+    }
+
     public List<ThongKeDong> thongKe(String tieuChi, LocalDate tuNgay, LocalDate denNgay) {
         if (!BaoCaoService.laTieuChiTheoPhongHopLe(tieuChi)
                 || tuNgay == null

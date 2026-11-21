@@ -170,6 +170,14 @@ public class DonMuonPhongDAO {
         return jdbcTemplate.update(sql, trangThai.name(), idDon);
     }
 
+    public int huyDon(int idDon) {
+        if (idDon <= 0) {
+            return 0;
+        }
+        String sql = "UPDATE tblDonMuonPhong SET trangThai = ? WHERE id = ?";
+        return jdbcTemplate.update(sql, TrangThaiDon.DaHuy.name(), idDon);
+    }
+
     public boolean kiemTraTrungLich(DonMuonPhong don, Phong phong) {
         if (don == null || don.getNgaySuDung() == null || don.getGioBatDau() == null || don.getGioKetThuc() == null) {
             return true;

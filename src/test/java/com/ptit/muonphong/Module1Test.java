@@ -1,12 +1,16 @@
 package com.ptit.muonphong;
 
 import com.ptit.muonphong.config.*;
+import com.ptit.muonphong.controller.HuyDonController;
 import com.ptit.muonphong.controller.NopDonController;
 import com.ptit.muonphong.controller.TheoDoiDonController;
 import com.ptit.muonphong.controller.TraCuuLichController;
 import com.ptit.muonphong.dao.*;
 import com.ptit.muonphong.entity.*;
 import com.ptit.muonphong.service.AuthService;
+import com.ptit.muonphong.service.HuyDonService;
+import com.ptit.muonphong.service.HuyDonService.KetQuaHuyDon;
+import com.ptit.muonphong.service.HuyDonService.ThongTinHuyDonResult;
 import com.ptit.muonphong.service.NopDonService;
 import com.ptit.muonphong.service.NopDonService.KetQuaNopDon;
 import com.ptit.muonphong.service.NopDonService.NopDonCommand;
@@ -48,7 +52,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest({TraCuuLichController.class, NopDonController.class, TheoDoiDonController.class})
+@WebMvcTest({TraCuuLichController.class, NopDonController.class, TheoDoiDonController.class, HuyDonController.class})
 @Import({SecurityConfig.class, CustomUserDetailsService.class, AuthService.class})
 class Module1Test {
 
@@ -69,6 +73,9 @@ class Module1Test {
 
     @MockBean
     private SuaDonService suaDonService;
+
+    @MockBean
+    private HuyDonService huyDonService;
 
     private SinhVien createActiveSinhVien() {
         DonVi dv = new DonVi();
@@ -890,5 +897,205 @@ class Module1Test {
         mockMvc.perform(get("/theo-doi-don").with(asSinhVien()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("/theo-doi-don/5/sua")));
+    }
+
+    @Test
+    void uc06_dao_huyDonVaGiaiPhongKhungGio() {
+        JdbcTemplate jdbc = mock(JdbcTemplate.class);
+        DonMuonPhongDAO donDAO = new DonMuonPhongDAO(jdbc);
+        LichSuDungPhongDAO lichDAO = new LichSuDungPhongDAO(jdbc);
+
+        when(jdbc.update(anyString(), eq("DaHuy"), eq(7))).thenReturn(1);
+        assertEquals(1, donDAO.huyDon(7));
+        ArgumentCaptor<String> sqlDon = ArgumentCaptor.forClass(String.class);
+        verify(jdbc).update(sqlDon.capture(), eq("DaHuy"), eq(7));
+        assertTrue(sqlDon.getValue().contains("UPDATE tblDonMuonPhong SET trangThai = ? WHERE id = ?"));
+        assertEquals(0, donDAO.huyDon(0));
+
+        when(jdbc.update(anyString(), eq(7))).thenReturn(1);
+        assertEquals(1, lichDAO.giaiPhongKhungGio(7));
+        ArgumentCaptor<String> sqlLich = ArgumentCaptor.forClass(String.class);
+        verify(jdbc).update(sqlLich.capture(), eq(7));
+        assertTrue(sqlLich.getValue().contains("DELETE FROM tblLichSuDungPhong WHERE donMuonPhongId = ?"));
+        assertEquals(0, lichDAO.giaiPhongKhungGio(0));
+    }
+
+    @Test
+    void uc06_entityAndService_choPhepDungTrangThaiVaThoiGianVaChanKhongHopLe() {
+        DonMuonPhongDAO donDAO = mock(DonMuonPhongDAO.class);
+        LichSuDungPhongDAO lichDAO = mock(LichSuDungPhongDAO.class);
+        LichSuDonDAO lichSuDonDAO = mock(LichSuDonDAO.class);
+
+        LocalDateTime fixedNow = LocalDateTime.of(2026, 11, 21, 10, 0);
+        java.time.Clock fixedClock = java.time.Clock.fixed(
+                fixedNow.atZone(java.time.ZoneId.systemDefault()).toInstant(),
+                java.time.ZoneId.systemDefault());
+        HuyDonService service = new HuyDonService(donDAO, lichDAO, lichSuDonDAO, fixedClock);
+
+        SinhVien chuDon = createActiveSinhVien();
+        SinhVien nguoiKhac = createActiveSinhVien();
+        nguoiKhac.setId(99);
+        CanBoDoan canBo = createActiveCanBoDoan();
+
+        DonMuonPhong donCho1 = new DonMuonPhong();
+        donCho1.setId(1);
+        donCho1.setTrangThai(TrangThaiDon.ChoDuyetCap1);
+        donCho1.setSinhVien(chuDon);
+        assertTrue(donCho1.coTheHuy(fixedNow));
+
+        DonMuonPhong donCho2 = new DonMuonPhong();
+        donCho2.setId(2);
+        donCho2.setTrangThai(TrangThaiDon.ChoDuyetCap2);
+        donCho2.setSinhVien(chuDon);
+        assertTrue(donCho2.coTheHuy(fixedNow));
+
+        DonMuonPhong donDaDuyetConHan = new DonMuonPhong();
+        donDaDuyetConHan.setId(3);
+        donDaDuyetConHan.setTrangThai(TrangThaiDon.DaPheDuyet);
+        donDaDuyetConHan.setNgaySuDung(LocalDate.of(2026, 11, 21));
+        donDaDuyetConHan.setGioBatDau(LocalTime.of(10, 1));
+        donDaDuyetConHan.setSinhVien(chuDon);
+        assertTrue(donDaDuyetConHan.coTheHuy(fixedNow));
+
+        DonMuonPhong donDaDuyetDenGio = new DonMuonPhong();
+        donDaDuyetDenGio.setId(4);
+        donDaDuyetDenGio.setTrangThai(TrangThaiDon.DaPheDuyet);
+        donDaDuyetDenGio.setNgaySuDung(LocalDate.of(2026, 11, 21));
+        donDaDuyetDenGio.setGioBatDau(LocalTime.of(10, 0));
+        donDaDuyetDenGio.setSinhVien(chuDon);
+        assertFalse(donDaDuyetDenGio.coTheHuy(fixedNow));
+
+        for (TrangThaiDon tt : List.of(TrangThaiDon.TuChoiCap1, TrangThaiDon.TuChoiCap2, TrangThaiDon.DaHuy, TrangThaiDon.HoanThanh)) {
+            DonMuonPhong donKetThuc = new DonMuonPhong();
+            donKetThuc.setId(5);
+            donKetThuc.setTrangThai(tt);
+            donKetThuc.setSinhVien(chuDon);
+            assertFalse(donKetThuc.coTheHuy(fixedNow));
+            when(donDAO.getChiTiet(5)).thenReturn(donKetThuc);
+            when(donDAO.lockDonById(5)).thenReturn(donKetThuc);
+            assertFalse(service.getChiTietDonDeHuy(5, chuDon).isChoPhep());
+            assertFalse(service.huyDon(5, chuDon).isThanhCong());
+        }
+
+        when(donDAO.getChiTiet(2)).thenReturn(donCho2);
+        when(donDAO.lockDonById(2)).thenReturn(donCho2);
+        when(donDAO.lockDonById(4)).thenReturn(donDaDuyetDenGio);
+
+        assertFalse(service.getChiTietDonDeHuy(2, canBo).isChoPhep());
+        assertFalse(service.getChiTietDonDeHuy(2, nguoiKhac).isChoPhep());
+        assertFalse(service.huyDon(2, nguoiKhac).isThanhCong());
+        assertFalse(service.huyDon(4, chuDon).isThanhCong());
+
+        when(donDAO.huyDon(2)).thenReturn(1);
+        when(lichDAO.getPhongBoTriTheoDon(2)).thenReturn(null);
+
+        KetQuaHuyDon kqCho2 = service.huyDon(2, chuDon);
+        assertTrue(kqCho2.isThanhCong());
+        assertEquals(TrangThaiDon.DaHuy, kqCho2.getDon().getTrangThai());
+        verify(donDAO).huyDon(2);
+        verify(lichDAO, never()).giaiPhongKhungGio(2);
+
+        Phong phongBoTri = createPhong(1, "HT-A2", "Hội trường A2", "Đang hoạt động");
+        when(donDAO.lockDonById(3)).thenReturn(donDaDuyetConHan);
+        when(donDAO.huyDon(3)).thenReturn(1);
+        when(lichDAO.getPhongBoTriTheoDon(3)).thenReturn(phongBoTri);
+
+        KetQuaHuyDon kqDaDuyet = service.huyDon(3, chuDon);
+        assertTrue(kqDaDuyet.isThanhCong());
+        verify(donDAO).huyDon(3);
+        verify(lichDAO).giaiPhongKhungGio(3);
+
+        ArgumentCaptor<LichSuDon> lsCaptor = ArgumentCaptor.forClass(LichSuDon.class);
+        verify(lichSuDonDAO, times(2)).ghiThayDoi(lsCaptor.capture());
+        assertEquals(TrangThaiDon.ChoDuyetCap2, lsCaptor.getAllValues().get(0).getTrangThaiCu());
+        assertEquals(TrangThaiDon.DaHuy, lsCaptor.getAllValues().get(0).getTrangThaiMoi());
+        assertEquals("Người mượn hủy đơn", lsCaptor.getAllValues().get(0).getGhiChu());
+        assertEquals(TrangThaiDon.DaPheDuyet, lsCaptor.getAllValues().get(1).getTrangThaiCu());
+        assertEquals(TrangThaiDon.DaHuy, lsCaptor.getAllValues().get(1).getTrangThaiMoi());
+    }
+
+    @Test
+    void uc06_controller_hienThiXacNhanHuyVaThucHienHuyVaTheoDoiDonAnHienNut() throws Exception {
+        SinhVien sv = createActiveSinhVien();
+        Phong phongBoTri = createPhong(2, "HT-01", "Hội trường lớn", "Đang hoạt động");
+
+        DonMuonPhong donChoCap2 = new DonMuonPhong();
+        donChoCap2.setId(6);
+        donChoCap2.setMaDon("DM-006");
+        donChoCap2.setNgaySuDung(LocalDate.of(2026, 12, 25));
+        donChoCap2.setGioBatDau(LocalTime.of(8, 0));
+        donChoCap2.setGioKetThuc(LocalTime.of(10, 0));
+        donChoCap2.setLoaiPhongMongMuon("Hội trường");
+        donChoCap2.setTenSuKien("Ngày hội CLB");
+        donChoCap2.setSoNguoiThamDu(150);
+        donChoCap2.setMucDich("Giao lưu");
+        donChoCap2.setNoiDung("Nội dung");
+        donChoCap2.setTrangThai(TrangThaiDon.ChoDuyetCap2);
+        donChoCap2.setDonVi(sv.getDonVi());
+        donChoCap2.setSinhVien(sv);
+
+        DonMuonPhong donDaHuy = new DonMuonPhong();
+        donDaHuy.setId(7);
+        donDaHuy.setMaDon("DM-007");
+        donDaHuy.setNgaySuDung(LocalDate.of(2026, 12, 26));
+        donDaHuy.setGioBatDau(LocalTime.of(8, 0));
+        donDaHuy.setGioKetThuc(LocalTime.of(10, 0));
+        donDaHuy.setTrangThai(TrangThaiDon.DaHuy);
+        donDaHuy.setDonVi(sv.getDonVi());
+        donDaHuy.setSinhVien(sv);
+
+        when(theoDoiDonService.timDonCuaNguoiMuon(any(NguoiDung.class), isNull(), isNull(), isNull(), isNull()))
+                .thenReturn(new DanhSachDonResult(List.of(donChoCap2, donDaHuy), Map.of(6, phongBoTri)));
+        when(theoDoiDonService.getChiTietDon(eq(6), any(NguoiDung.class)))
+                .thenReturn(new ChiTietDonResult(donChoCap2, phongBoTri, List.of(), List.of(), false));
+
+        mockMvc.perform(get("/theo-doi-don")
+                        .with(asSinhVien())
+                        .param("donId", "6"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("/theo-doi-don/6/huy")))
+                .andExpect(content().string(not(containsString("/theo-doi-don/7/huy"))));
+
+        when(huyDonService.getChiTietDonDeHuy(eq(6), any(NguoiDung.class)))
+                .thenReturn(ThongTinHuyDonResult.choPhep(donChoCap2, phongBoTri));
+
+        mockMvc.perform(get("/theo-doi-don/6/huy").with(asSinhVien()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Xác nhận hủy đơn mượn phòng")))
+                .andExpect(content().string(containsString("DM-006")))
+                .andExpect(content().string(containsString("HT-01 - Hội trường lớn")))
+                .andExpect(content().string(containsString("Xác nhận hủy")))
+                .andExpect(content().string(containsString("Không")));
+
+        when(huyDonService.getChiTietDonDeHuy(eq(7), any(NguoiDung.class)))
+                .thenReturn(ThongTinHuyDonResult.khongChoPhep("Đơn đã kết thúc."));
+
+        mockMvc.perform(get("/theo-doi-don/7/huy").with(asSinhVien()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/theo-doi-don"))
+                .andExpect(flash().attribute("errorMessage", "Đơn đã kết thúc."));
+
+        when(huyDonService.huyDon(eq(6), any(NguoiDung.class)))
+                .thenReturn(KetQuaHuyDon.thanhCong(donChoCap2));
+
+        mockMvc.perform(post("/theo-doi-don/6/huy")
+                        .with(asSinhVien())
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/theo-doi-don"))
+                .andExpect(flash().attribute("successMessage", "Hủy đơn thành công."));
+
+        when(huyDonService.huyDon(eq(7), any(NguoiDung.class)))
+                .thenReturn(KetQuaHuyDon.thatBai("Không thể hủy đơn."));
+
+        mockMvc.perform(post("/theo-doi-don/7/huy")
+                        .with(asSinhVien())
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/theo-doi-don"))
+                .andExpect(flash().attribute("errorMessage", "Không thể hủy đơn."));
+
+        mockMvc.perform(get("/theo-doi-don/6/huy").with(asCanBoDoan()))
+                .andExpect(status().isForbidden());
     }
 }

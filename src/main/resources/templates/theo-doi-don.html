@@ -415,6 +415,11 @@
                                th:href="@{/theo-doi-don/{id}/sua(id=${don.id})}">
                                 Sửa
                             </a>
+                            <a th:if="${don.coTheHuy()}"
+                               class="btn btn-accent btn-sm"
+                               th:href="@{/theo-doi-don/{id}/huy(id=${don.id})}">
+                                Hủy
+                            </a>
                         </div>
                     </td>
                 </tr>
@@ -434,6 +439,11 @@
                    th:href="@{/theo-doi-don/{id}/sua(id=${chiTietDon.don.id})}"
                    class="btn btn-primary btn-sm">
                     Sửa
+                </a>
+                <a th:if="${chiTietDon.don.coTheHuy()}"
+                   th:href="@{/theo-doi-don/{id}/huy(id=${chiTietDon.don.id})}"
+                   class="btn btn-accent btn-sm">
+                    Hủy
                 </a>
                 <a th:if="${chiTietDon.coTheTaoLai}"
                    th:href="@{/nop-don(donCuId=${chiTietDon.don.id})}"

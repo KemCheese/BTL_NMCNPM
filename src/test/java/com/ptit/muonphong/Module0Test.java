@@ -148,6 +148,8 @@ class Module0Test {
 
                 mockMvc.perform(get("/trang-chu").session(session))
                                 .andExpect(status().isOk())
+                                .andExpect(content().string(containsString("Hệ thống mượn phòng trực tuyến PTIT")))
+                                .andExpect(content().string(containsString("id=\"logoutModal\"")))
                                 .andExpect(content().string(containsString("NGƯỜI MƯỢN")))
                                 .andExpect(content().string(containsString("Tra cứu lịch phòng")))
                                 .andExpect(content().string(containsString("Nộp đơn")))

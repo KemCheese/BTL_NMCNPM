@@ -482,7 +482,7 @@
 
 <body>
 
-    <header th:replace="~{trang-chu :: header(${nguoiDung})}"></header>
+    <header th:replace="~{app-shell :: header(${nguoiDung})}"></header>
 
     <main class="container">
         <section class="panel">
@@ -624,9 +624,6 @@
 
                 <div class="form-actions">
                     <button type="submit" class="btn-primary">Lưu</button>
-                    <a th:if="${editMode}" class="btn-secondary"
-                        th:href="@{/quan-ly-phong(tuKhoa=${#strings.isEmpty(tuKhoa) ? null : tuKhoa})}">Hủy sửa</a>
-                    <button th:unless="${editMode}" type="reset" class="btn-secondary">Làm mới</button>
                 </div>
             </form>
         </section>
@@ -685,7 +682,7 @@
         </div>
     </div>
 
-    <div th:replace="~{trang-chu :: logoutModal}"></div>
+    <div th:replace="~{app-shell :: logoutModal}"></div>
 
     <script>
         function focusAddForm() {

@@ -1,12 +1,22 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chi tiết phòng</title>
     <style>
-        * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
-        body { margin: 0; background: #f4f6f9; color: #1f2937; }
+        * {
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
         .topbar {
             background: #1c355e;
             color: #ffffff;
@@ -16,18 +26,21 @@
             justify-content: space-between;
             gap: 16px;
         }
+
         .topbar-brand {
             color: #ffffff;
             text-decoration: none;
             font-size: 17px;
             font-weight: 700;
         }
+
         .topbar-user {
             display: flex;
             align-items: center;
             gap: 10px;
             font-size: 13px;
         }
+
         .role-badge {
             background: #ffffff;
             color: #1c355e;
@@ -36,6 +49,7 @@
             font-size: 11px;
             font-weight: 700;
         }
+
         .btn-logout-link {
             background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.55);
@@ -46,13 +60,17 @@
             cursor: pointer;
             text-decoration: none;
         }
-        .btn-logout-link:hover { background: rgba(255, 255, 255, 0.12); }
+
+        .btn-logout-link:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
 
         .container {
             max-width: 960px;
             margin: 28px auto;
             padding: 0 16px;
         }
+
         .panel {
             background: #ffffff;
             border: 1px solid #d9dee6;
@@ -60,6 +78,7 @@
             padding: 24px;
             margin-bottom: 20px;
         }
+
         .header-row {
             display: flex;
             align-items: center;
@@ -68,16 +87,19 @@
             gap: 12px;
             margin-bottom: 18px;
         }
+
         .page-title {
             margin: 0 0 4px;
             color: #1c355e;
             font-size: 22px;
         }
+
         .page-subtitle {
             margin: 0;
             color: #5b6777;
             font-size: 13px;
         }
+
         .btn-secondary {
             display: inline-block;
             padding: 8px 14px;
@@ -90,7 +112,11 @@
             font-weight: 600;
             cursor: pointer;
         }
-        .btn-secondary:hover { background: #f8fafc; }
+
+        .btn-secondary:hover {
+            background: #f8fafc;
+        }
+
         .btn-primary {
             display: inline-block;
             padding: 8px 16px;
@@ -103,29 +129,36 @@
             font-weight: 600;
             cursor: pointer;
         }
-        .btn-primary:hover { background: #152847; }
+
+        .btn-primary:hover {
+            background: #152847;
+        }
 
         .detail-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 14px;
         }
+
         .detail-item {
             padding: 12px;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 4px;
         }
+
         .detail-label {
             font-size: 12px;
             color: #64748b;
             margin-bottom: 4px;
         }
+
         .detail-value {
             font-size: 14px;
             font-weight: 600;
             color: #1f2937;
         }
+
         .badge {
             display: inline-block;
             padding: 2px 8px;
@@ -133,8 +166,18 @@
             font-size: 11px;
             font-weight: 700;
         }
-        .badge-active { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
-        .badge-inactive { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+        .badge-active {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
+
+        .badge-inactive {
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
 
         .date-bar {
             display: flex;
@@ -144,11 +187,13 @@
             gap: 12px;
             margin-bottom: 14px;
         }
+
         .date-form {
             display: flex;
             align-items: center;
             gap: 8px;
         }
+
         .date-form input {
             padding: 7px 10px;
             border: 1px solid #c6cdd8;
@@ -161,16 +206,20 @@
             border-collapse: collapse;
             font-size: 13px;
         }
-        th, td {
+
+        th,
+        td {
             padding: 10px 12px;
             border-bottom: 1px solid #e5e7eb;
             text-align: left;
         }
+
         th {
             background: #f1f5f9;
             color: #1c355e;
             font-weight: 700;
         }
+
         .alert-empty {
             padding: 16px;
             border-radius: 4px;
@@ -180,6 +229,7 @@
             font-size: 13px;
             text-align: center;
         }
+
         .footer-actions {
             display: flex;
             gap: 10px;
@@ -197,7 +247,11 @@
             padding: 16px;
             z-index: 1000;
         }
-        .modal-backdrop.open { display: flex; }
+
+        .modal-backdrop.open {
+            display: flex;
+        }
+
         .modal-box {
             width: 100%;
             max-width: 380px;
@@ -206,9 +260,25 @@
             padding: 22px;
             border: 1px solid #d9dee6;
         }
-        .modal-box h2 { margin: 0 0 10px; font-size: 18px; color: #1c355e; }
-        .modal-box p { margin: 0 0 18px; font-size: 14px; color: #374151; }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+        .modal-box h2 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            color: #1c355e;
+        }
+
+        .modal-box p {
+            margin: 0 0 18px;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
         .btn-stay {
             padding: 8px 14px;
             border: 1px solid #c6cdd8;
@@ -217,6 +287,7 @@
             font-size: 13px;
             cursor: pointer;
         }
+
         .btn-confirm-logout {
             padding: 8px 14px;
             border: none;
@@ -229,101 +300,107 @@
         }
     </style>
 </head>
+
 <body>
 
-<div th:replace="~{trang-chu :: header(${nguoiDung})}"></div>
+    <div th:replace="~{app-shell :: header(${nguoiDung})}"></div>
 
-<main class="container">
-    <section class="panel">
-        <div class="header-row">
-            <div>
-                <h1 class="page-title" th:text="${chiTiet.phong.tenPhong}">Hội trường A2</h1>
-                <p class="page-subtitle" th:text="${'Mã phòng: ' + chiTiet.phong.maPhong}">Mã phòng: HT-A2</p>
+    <main class="container">
+        <section class="panel">
+            <div class="header-row">
+                <div>
+                    <h1 class="page-title" th:text="${chiTiet.phong.tenPhong}">Hội trường A2</h1>
+                    <p class="page-subtitle" th:text="${'Mã phòng: ' + chiTiet.phong.maPhong}">Mã phòng: HT-A2</p>
+                </div>
+                <a class="btn-secondary" th:href="@{/tra-cuu-lich(ngay=${ngay})}">Quay lại danh sách</a>
             </div>
-            <a class="btn-secondary" th:href="@{/tra-cuu-lich(ngay=${ngay})}">Quay lại danh sách</a>
-        </div>
 
-        <div class="detail-grid">
-            <div class="detail-item">
-                <div class="detail-label">Tòa nhà / Tầng</div>
-                <div class="detail-value" th:text="${'Nhà ' + chiTiet.phong.toaNha + ' - Tầng ' + chiTiet.phong.tang}">Nhà A2 - Tầng 1</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Loại phòng</div>
-                <div class="detail-value" th:text="${chiTiet.phong.loaiPhong}">Hội trường</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Sức chứa tối đa</div>
-                <div class="detail-value" th:text="${chiTiet.phong.sucChuaToiDa + ' chỗ'}">300 chỗ</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Tình trạng</div>
-                <div class="detail-value">
-                    <span class="badge"
-                          th:classappend="${chiTiet.sanSangMuon} ? 'badge-active' : 'badge-inactive'"
-                          th:text="${chiTiet.phong.tinhTrang}">Đang hoạt động</span>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Tòa nhà / Tầng</div>
+                    <div class="detail-value"
+                        th:text="${'Nhà ' + chiTiet.phong.toaNha + ' - Tầng ' + chiTiet.phong.tang}">Nhà A2 - Tầng 1
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Loại phòng</div>
+                    <div class="detail-value" th:text="${chiTiet.phong.loaiPhong}">Hội trường</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Sức chứa tối đa</div>
+                    <div class="detail-value" th:text="${chiTiet.phong.sucChuaToiDa + ' chỗ'}">300 chỗ</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Tình trạng</div>
+                    <div class="detail-value">
+                        <span class="badge" th:classappend="${chiTiet.sanSangMuon} ? 'badge-active' : 'badge-inactive'"
+                            th:text="${chiTiet.phong.tinhTrang}">Đang hoạt động</span>
+                    </div>
+                </div>
+                <div class="detail-item" style="grid-column: 1 / -1;">
+                    <div class="detail-label">Trang thiết bị</div>
+                    <div class="detail-value"
+                        th:text="${chiTiet.phong.trangThietBi != null && !#strings.isEmpty(chiTiet.phong.trangThietBi) ? chiTiet.phong.trangThietBi : 'Không có thông tin'}">
+                        máy chiếu</div>
+                </div>
+                <div class="detail-item" style="grid-column: 1 / -1;">
+                    <div class="detail-label">Mô tả</div>
+                    <div class="detail-value"
+                        th:text="${chiTiet.phong.moTa != null && !#strings.isEmpty(chiTiet.phong.moTa) ? chiTiet.phong.moTa : 'Không có mô tả thêm'}">
+                        Mô tả</div>
                 </div>
             </div>
-            <div class="detail-item" style="grid-column: 1 / -1;">
-                <div class="detail-label">Trang thiết bị</div>
-                <div class="detail-value"
-                     th:text="${chiTiet.phong.trangThietBi != null && !#strings.isEmpty(chiTiet.phong.trangThietBi) ? chiTiet.phong.trangThietBi : 'Không có thông tin'}">máy chiếu</div>
+        </section>
+
+        <section class="panel">
+            <div class="date-bar">
+                <h2 class="page-title" style="font-size: 18px; margin: 0;">
+                    Lịch sử dụng ngày <span th:text="${#temporals.format(ngay, 'dd/MM/yyyy')}">30/12/2026</span>
+                </h2>
+                <form class="date-form" th:action="@{/tra-cuu-lich/{id}(id=${chiTiet.phong.id})}" method="get">
+                    <label for="ngay" style="font-size: 13px; font-weight: 600;">Ngày:</label>
+                    <input type="date" id="ngay" name="ngay" th:value="${ngay}">
+                    <button type="submit" class="btn-secondary">Xem lịch</button>
+                </form>
             </div>
-            <div class="detail-item" style="grid-column: 1 / -1;">
-                <div class="detail-label">Mô tả</div>
-                <div class="detail-value"
-                     th:text="${chiTiet.phong.moTa != null && !#strings.isEmpty(chiTiet.phong.moTa) ? chiTiet.phong.moTa : 'Không có mô tả thêm'}">Mô tả</div>
+
+            <div class="alert-empty" th:if="${!chiTiet.coLichTrongNgay}">
+                Phòng chưa có lịch sử dụng nào trong ngày <span
+                    th:text="${#temporals.format(ngay, 'dd/MM/yyyy')}"></span>.
             </div>
-        </div>
-    </section>
 
-    <section class="panel">
-        <div class="date-bar">
-            <h2 class="page-title" style="font-size: 18px; margin: 0;">
-                Lịch sử dụng ngày <span th:text="${#temporals.format(ngay, 'dd/MM/yyyy')}">30/12/2026</span>
-            </h2>
-            <form class="date-form" th:action="@{/tra-cuu-lich/{id}(id=${chiTiet.phong.id})}" method="get">
-                <label for="ngay" style="font-size: 13px; font-weight: 600;">Đổi ngày:</label>
-                <input type="date" id="ngay" name="ngay" th:value="${ngay}">
-                <button type="submit" class="btn-secondary">Xem lịch</button>
-            </form>
-        </div>
+            <table th:if="${chiTiet.coLichTrongNgay}">
+                <thead>
+                    <tr>
+                        <th>Khung giờ</th>
+                        <th>Mã đơn</th>
+                        <th>Sự kiện</th>
+                        <th>Đơn vị sử dụng</th>
+                        <th>Trạng thái đơn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="lich : ${chiTiet.lichTrongNgay}">
+                        <td th:text="${lich.khungGioText}">08:00 - 11:00</td>
+                        <td th:text="${lich.donMuonPhong.maDon}">DM-003</td>
+                        <td th:text="${lich.donMuonPhong.tenSuKien}">Sinh hoạt chuyên đề</td>
+                        <td th:text="${lich.donMuonPhong.donVi != null ? lich.donMuonPhong.donVi.tenCLB : 'Chưa rõ'}">
+                            CLB ITPTIT</td>
+                        <td
+                            th:text="${lich.donMuonPhong.trangThai != null ? lich.donMuonPhong.trangThai.tenHienThi : ''}">
+                            Đã phê duyệt</td>
+                    </tr>
+                </tbody>
+            </table>
 
-        <div class="alert-empty" th:if="${!chiTiet.coLichTrongNgay}">
-            Phòng chưa có lịch sử dụng nào trong ngày <span th:text="${#temporals.format(ngay, 'dd/MM/yyyy')}"></span>.
-        </div>
+            <div class="footer-actions">
+                <a class="btn-secondary" th:href="@{/tra-cuu-lich(ngay=${ngay})}">Quay lại danh sách</a>
+            </div>
+        </section>
+    </main>
 
-        <table th:if="${chiTiet.coLichTrongNgay}">
-            <thead>
-            <tr>
-                <th>Khung giờ</th>
-                <th>Mã đơn</th>
-                <th>Sự kiện</th>
-                <th>Đơn vị sử dụng</th>
-                <th>Trạng thái đơn</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="lich : ${chiTiet.lichTrongNgay}">
-                <td th:text="${lich.khungGioText}">08:00 - 11:00</td>
-                <td th:text="${lich.donMuonPhong.maDon}">DM-003</td>
-                <td th:text="${lich.donMuonPhong.tenSuKien}">Sinh hoạt chuyên đề</td>
-                <td th:text="${lich.donMuonPhong.donVi != null ? lich.donMuonPhong.donVi.tenCLB : 'Chưa rõ'}">CLB ITPTIT</td>
-                <td th:text="${lich.donMuonPhong.trangThai != null ? lich.donMuonPhong.trangThai.tenHienThi : ''}">Đã phê duyệt</td>
-            </tr>
-            </tbody>
-        </table>
-
-        <div class="footer-actions">
-            <a class="btn-secondary" th:href="@{/tra-cuu-lich(ngay=${ngay})}">Quay lại danh sách</a>
-            <a class="btn-primary"
-               th:if="${chiTiet.sanSangMuon}"
-               th:href="@{/nop-don(phongId=${chiTiet.phong.id}, ngaySuDung=${ngay})}">Nộp đơn mượn phòng này</a>
-        </div>
-    </section>
-</main>
-
-<div th:replace="~{trang-chu :: logoutModal}"></div>
+    <div th:replace="~{app-shell :: logoutModal}"></div>
 
 </body>
+
 </html>

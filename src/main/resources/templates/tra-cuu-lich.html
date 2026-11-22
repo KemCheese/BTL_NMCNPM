@@ -259,7 +259,7 @@
 </head>
 <body>
 
-<div th:replace="~{trang-chu :: header(${nguoiDung})}"></div>
+<div th:replace="~{app-shell :: header(${nguoiDung})}"></div>
 
 <main class="container">
     <section class="panel">
@@ -307,7 +307,6 @@
 
             <div class="filter-actions">
                 <button type="submit" class="btn-primary">Tìm kiếm</button>
-                <a class="btn-secondary" th:href="@{/tra-cuu-lich}">Đặt lại</a>
             </div>
         </form>
 
@@ -358,9 +357,6 @@
                         <div class="action-links">
                             <a class="btn-secondary btn-sm"
                                th:href="@{/tra-cuu-lich/{id}(id=${item.phong.id}, ngay=${ngay})}">Chi tiết</a>
-                            <a class="btn-primary btn-sm"
-                               th:if="${item.sanSangMuon}"
-                               th:href="@{/nop-don(phongId=${item.phong.id}, ngaySuDung=${ngay})}">Nộp đơn</a>
                         </div>
                     </td>
                 </tr>
@@ -370,7 +366,7 @@
     </section>
 </main>
 
-<div th:replace="~{trang-chu :: logoutModal}"></div>
+<div th:replace="~{app-shell :: logoutModal}"></div>
 
 </body>
 </html>

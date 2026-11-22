@@ -14,7 +14,6 @@ import com.ptit.muonphong.entity.DonMuonPhong;
 import com.ptit.muonphong.entity.DonVi;
 import com.ptit.muonphong.entity.Phong;
 import com.ptit.muonphong.entity.SinhVien;
-import com.ptit.muonphong.entity.ThongKeDong;
 import com.ptit.muonphong.entity.TrangThaiDon;
 import com.ptit.muonphong.service.AuthService;
 import com.ptit.muonphong.service.BaoCaoService;
@@ -127,13 +126,15 @@ class Module4Test {
         LocalDate lastDay = today.withDayOfMonth(today.lengthOfMonth());
 
         Phong htA2 = createSamplePhong(1, "HT-A2", "Hội trường A2");
-        ThongKeDong row = new ThongKeDong(htA2, 2, 6.0, 1.29);
+        BaoCaoService.ThongKeDon row = new BaoCaoService.ThongKeDon(htA2, 2, 6.0, 1.29);
         when(baoCaoService.xemBaoCaoTheoPhong(BaoCaoService.TIEU_CHI_THEO_PHONG, firstDay, lastDay))
                 .thenReturn(List.of(row));
 
         mockMvc.perform(get("/bao-cao").with(user(new CustomUserDetails(createCanBoCSVC()))))
                 .andExpect(status().isOk())
                 .andExpect(view().name("bao-cao"))
+                .andExpect(content().string(containsString("Hệ thống mượn phòng trực tuyến PTIT")))
+                .andExpect(content().string(containsString("id=\"logoutModal\"")))
                 .andExpect(content().string(containsString("HT-A2")))
                 .andExpect(content().string(containsString("Hội trường A2")))
                 .andExpect(content().string(containsString("6.00 giờ")))
@@ -149,8 +150,8 @@ class Module4Test {
 
         Phong htB1 = createSamplePhong(2, "HT-B1", "Hội trường B1");
         Phong htA2 = createSamplePhong(1, "HT-A2", "Hội trường A2");
-        ThongKeDong row1 = new ThongKeDong(htB1, 3, 9.0, 1.94);
-        ThongKeDong row2 = new ThongKeDong(htA2, 1, 3.0, 0.65);
+        BaoCaoService.ThongKeDon row1 = new BaoCaoService.ThongKeDon(htB1, 3, 9.0, 1.94);
+        BaoCaoService.ThongKeDon row2 = new BaoCaoService.ThongKeDon(htA2, 1, 3.0, 0.65);
 
         when(baoCaoService.xemBaoCaoTheoPhong("Theo phòng", tuNgay, denNgay))
                 .thenReturn(List.of(row1, row2));
@@ -226,7 +227,7 @@ class Module4Test {
         LocalDate denNgay = LocalDate.of(2026, 12, 31);
 
         Phong htA2 = createSamplePhong(1, "HT-A2", "Hội trường A2");
-        ThongKeDong row = new ThongKeDong(htA2, 1, 3.0, 0.65);
+        BaoCaoService.ThongKeDon row = new BaoCaoService.ThongKeDon(htA2, 1, 3.0, 0.65);
 
         DonVi clb = new DonVi();
         clb.setId(1);
@@ -271,7 +272,7 @@ class Module4Test {
         LocalDate denNgay = LocalDate.of(2026, 12, 31);
 
         Phong htA2 = createSamplePhong(1, "HT-A2", "Hội trường A2");
-        ThongKeDong row = new ThongKeDong(htA2, 1, 3.0, 0.65);
+        BaoCaoService.ThongKeDon row = new BaoCaoService.ThongKeDon(htA2, 1, 3.0, 0.65);
 
         when(baoCaoService.xemBaoCaoTheoPhong("Theo phòng", tuNgay, denNgay)).thenReturn(List.of(row));
         when(baoCaoService.xemChiTietDong(999, tuNgay, denNgay))
@@ -345,12 +346,12 @@ class Module4Test {
         Phong htA2 = createSamplePhong(1, "HT-A2", "Hội trường A2");
         Phong htB1 = createSamplePhong(2, "HT-B1", "Hội trường B1");
 
-        ThongKeDong low = new ThongKeDong(htA2, 1, 3.0, 0.0);
-        ThongKeDong high = new ThongKeDong(htB1, 2, 7.5, 0.0);
+        BaoCaoService.ThongKeDon low = new BaoCaoService.ThongKeDon(htA2, 1, 3.0, 0.0);
+        BaoCaoService.ThongKeDon high = new BaoCaoService.ThongKeDon(htB1, 2, 7.5, 0.0);
 
         when(daoMock.thongKe("Theo phòng", tuNgay, denNgay)).thenReturn(List.of(low, high));
 
-        List<ThongKeDong> result = service.xemBaoCaoTheoPhong("Theo phòng", tuNgay, denNgay);
+        List<BaoCaoService.ThongKeDon> result = service.xemBaoCaoTheoPhong("Theo phòng", tuNgay, denNgay);
         assertEquals(2, result.size());
         assertEquals("HT-B1", result.get(0).getPhong().getMaPhong());
         assertEquals(25.0, result.get(0).getTyLeSuDung(), 0.001);
@@ -446,13 +447,13 @@ class Module4Test {
         verifyNoInteractions(jdbcMock);
 
         Phong htA2 = createSamplePhong(1, "HT-A2", "Hội trường A2");
-        ThongKeDong expectedRow = new ThongKeDong(htA2, 1, 3.0, 0.65);
+        BaoCaoService.ThongKeDon expectedRow = new BaoCaoService.ThongKeDon(htA2, 1, 3.0, 0.65);
 
         when(jdbcMock.query(anyString(), any(RowMapper.class),
                 eq("DaPheDuyet"), eq(Date.valueOf(tuNgay)), eq(Date.valueOf(denNgay))))
                 .thenReturn(List.of(expectedRow));
 
-        List<ThongKeDong> rows = dao.thongKe("Theo phòng", tuNgay, denNgay);
+        List<BaoCaoService.ThongKeDon> rows = dao.thongKe("Theo phòng", tuNgay, denNgay);
         assertEquals(1, rows.size());
         assertEquals("HT-A2", rows.get(0).getPhong().getMaPhong());
         assertEquals(3.0, rows.get(0).getTongGio(), 0.001);

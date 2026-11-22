@@ -350,7 +350,7 @@
 </head>
 <body>
 
-<header th:replace="~{trang-chu :: header(${nguoiDung})}"></header>
+<header th:replace="~{app-shell :: header(${nguoiDung})}"></header>
 
 <main class="container">
     <div class="breadcrumb">
@@ -374,7 +374,6 @@
                         th:selected="${tenCLB == clb}"></option>
             </select>
             <button type="submit" class="btn-primary">Lọc</button>
-            <a th:href="@{/duyet-cap-1}" class="btn-secondary">Đặt lại</a>
         </form>
 
         <div class="empty-state" th:if="${#lists.isEmpty(danhSachDon)}">
@@ -391,7 +390,6 @@
                     <th>CLB / Đội nhóm</th>
                     <th>Người mượn</th>
                     <th>Ngày sử dụng</th>
-                    <th>Khung giờ</th>
                     <th>Phòng mong muốn</th>
                     <th>Trạng thái</th>
                     <th>Thao tác</th>
@@ -408,8 +406,12 @@
                         <div th:text="${don.sinhVien != null ? don.sinhVien.hoTen : ''}">Sinh viên</div>
                         <small style="color:#64748b" th:text="${don.sinhVien != null ? don.sinhVien.maSinhVien : ''}"></small>
                     </td>
-                    <td class="nowrap" th:text="${#temporals.format(don.ngaySuDung, 'dd/MM/yyyy')}">25/12/2026</td>
-                    <td class="nowrap" th:text="${#temporals.format(don.gioBatDau, 'HH:mm') + ' - ' + #temporals.format(don.gioKetThuc, 'HH:mm')}">18:00 - 21:00</td>
+                    <td class="nowrap">
+                        <span th:text="${don.ngaySuDung != null ? #temporals.format(don.ngaySuDung, 'dd/MM/yyyy') : '—'}">25/12/2026</span>
+                        <div style="color:#64748b;font-size:12px;"
+                             th:if="${don.gioBatDau != null and don.gioKetThuc != null}"
+                             th:text="${#temporals.format(don.gioBatDau, 'HH:mm') + ' - ' + #temporals.format(don.gioKetThuc, 'HH:mm')}">18:00 - 21:00</div>
+                    </td>
                     <td>
                         <div th:text="${don.loaiPhongMongMuon}">Hội trường</div>
                         <small style="color:#64748b"
@@ -517,7 +519,7 @@
     </section>
 </main>
 
-<div th:replace="~{trang-chu :: logoutModal}"></div>
+<div th:replace="~{app-shell :: logoutModal}"></div>
 
 </body>
 </html>

@@ -1,12 +1,22 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Duyệt đơn cấp 2 và bố trí phòng</title>
     <style>
-        * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
-        body { margin: 0; background: #f4f6f9; color: #1f2937; }
+        * {
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
         .topbar {
             background: #1c355e;
             color: #ffffff;
@@ -16,18 +26,21 @@
             justify-content: space-between;
             gap: 16px;
         }
+
         .topbar-brand {
             color: #ffffff;
             text-decoration: none;
             font-size: 17px;
             font-weight: 700;
         }
+
         .topbar-user {
             display: flex;
             align-items: center;
             gap: 10px;
             font-size: 13px;
         }
+
         .role-badge {
             background: #ffffff;
             color: #1c355e;
@@ -36,6 +49,7 @@
             font-size: 11px;
             font-weight: 700;
         }
+
         .btn-logout-link {
             background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.55);
@@ -46,23 +60,31 @@
             cursor: pointer;
             text-decoration: none;
         }
-        .btn-logout-link:hover { background: rgba(255, 255, 255, 0.12); }
+
+        .btn-logout-link:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
 
         .container {
             max-width: 1260px;
             margin: 24px auto;
             padding: 0 16px 32px;
         }
+
         .breadcrumb {
             margin-bottom: 14px;
             font-size: 13px;
         }
+
         .breadcrumb a {
             color: #1c355e;
             text-decoration: none;
             font-weight: 600;
         }
-        .breadcrumb a:hover { text-decoration: underline; }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
 
         .panel {
             background: #ffffff;
@@ -71,11 +93,13 @@
             padding: 22px 24px;
             margin-bottom: 20px;
         }
+
         .page-title {
             margin: 0 0 6px;
             color: #1c355e;
             font-size: 22px;
         }
+
         .page-subtitle {
             margin: 0 0 18px;
             color: #4b5563;
@@ -89,11 +113,13 @@
             font-size: 13px;
             font-weight: 500;
         }
+
         .alert-success {
             background: #ecfdf5;
             border: 1px solid #a7f3d0;
             color: #065f46;
         }
+
         .alert-error {
             background: #fef2f2;
             border: 1px solid #fecaca;
@@ -108,6 +134,7 @@
             margin-bottom: 18px;
             padding-bottom: 10px;
         }
+
         .tab-link {
             display: inline-block;
             padding: 8px 16px;
@@ -120,7 +147,11 @@
             text-decoration: none;
             white-space: nowrap;
         }
-        .tab-link:hover { background: #eef2f7; }
+
+        .tab-link:hover {
+            background: #eef2f7;
+        }
+
         .tab-link.active {
             background: #1c355e;
             border-color: #1c355e;
@@ -141,7 +172,11 @@
             white-space: nowrap;
             text-align: center;
         }
-        .btn-primary:hover { background: #152847; }
+
+        .btn-primary:hover {
+            background: #152847;
+        }
+
         .btn-secondary {
             display: inline-block;
             padding: 7px 14px;
@@ -156,28 +191,44 @@
             white-space: nowrap;
             text-align: center;
         }
-        .btn-secondary:hover { background: #f1f5f9; }
-        .nowrap { white-space: nowrap; }
 
-        .table-wrap { overflow-x: auto; }
+        .btn-secondary:hover {
+            background: #f1f5f9;
+        }
+
+        .nowrap {
+            white-space: nowrap;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 13px;
         }
-        th, td {
+
+        th,
+        td {
             padding: 10px 12px;
             border-bottom: 1px solid #e5e7eb;
             text-align: left;
             vertical-align: top;
         }
+
         th {
             background: #f1f5f9;
             color: #1c355e;
             font-weight: 700;
             white-space: nowrap;
         }
-        tr.selected-row { background: #eff6ff; }
+
+        tr.selected-row {
+            background: #eff6ff;
+        }
+
         .badge-status {
             display: inline-block;
             padding: 3px 9px;
@@ -188,10 +239,12 @@
             color: #92400e;
             white-space: nowrap;
         }
+
         .badge-approved {
             background: #dcfce7;
             color: #166534;
         }
+
         .badge-wish {
             display: inline-block;
             margin-left: 6px;
@@ -202,6 +255,7 @@
             background: #dbeafe;
             color: #1e40af;
         }
+
         .empty-state {
             padding: 24px;
             text-align: center;
@@ -221,30 +275,36 @@
             padding-bottom: 12px;
             margin-bottom: 16px;
         }
+
         .detail-header h2 {
             margin: 0;
             color: #1c355e;
             font-size: 18px;
         }
+
         .detail-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 14px 24px;
             margin-bottom: 20px;
         }
+
         .detail-item-label {
             font-size: 12px;
             font-weight: 600;
             color: #64748b;
             margin-bottom: 3px;
         }
+
         .detail-item-value {
             font-size: 14px;
             color: #111827;
         }
+
         .detail-block {
             margin-bottom: 16px;
         }
+
         .detail-block .detail-item-value {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
@@ -265,10 +325,12 @@
             border-radius: 6px;
             margin: 18px 0;
         }
+
         .room-section {
             margin-top: 14px;
             margin-bottom: 20px;
         }
+
         .room-section h3 {
             margin: 0 0 10px;
             font-size: 15px;
@@ -283,25 +345,32 @@
             gap: 18px;
             align-items: start;
         }
+
         @media (max-width: 760px) {
-            .decision-section { grid-template-columns: 1fr; }
+            .decision-section {
+                grid-template-columns: 1fr;
+            }
         }
+
         .action-box {
             border: 1px solid #dbe2ea;
             border-radius: 6px;
             padding: 16px;
             background: #f8fafc;
         }
+
         .action-box h3 {
             margin: 0 0 8px;
             font-size: 15px;
             color: #1c355e;
         }
+
         .action-box p {
             margin: 0 0 12px;
             font-size: 13px;
             color: #4b5563;
         }
+
         .btn-approve {
             padding: 9px 18px;
             border: none;
@@ -313,7 +382,11 @@
             cursor: pointer;
             white-space: nowrap;
         }
-        .btn-approve:hover { background: #166534; }
+
+        .btn-approve:hover {
+            background: #166534;
+        }
+
         .btn-reject {
             padding: 9px 18px;
             border: none;
@@ -325,7 +398,11 @@
             cursor: pointer;
             white-space: nowrap;
         }
-        .btn-reject:hover { background: #991b1b; }
+
+        .btn-reject:hover {
+            background: #991b1b;
+        }
+
         .reject-form label {
             display: block;
             font-size: 13px;
@@ -333,6 +410,7 @@
             color: #1f2937;
             margin-bottom: 6px;
         }
+
         .reject-form textarea {
             width: 100%;
             padding: 8px 10px;
@@ -351,6 +429,7 @@
             grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
             gap: 18px;
         }
+
         .history-box h3 {
             margin: 0 0 10px;
             font-size: 14px;
@@ -367,7 +446,11 @@
             padding: 16px;
             z-index: 1000;
         }
-        .modal-backdrop.open { display: flex; }
+
+        .modal-backdrop.open {
+            display: flex;
+        }
+
         .modal-box {
             width: 100%;
             max-width: 380px;
@@ -378,9 +461,26 @@
             text-align: center;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
         }
-        .modal-box h2 { margin: 0 0 10px; font-size: 18px; color: #1f2937; }
-        .modal-box p { margin: 0 0 6px; font-size: 13px; color: #4b5563; }
-        .modal-actions { margin-top: 18px; display: flex; justify-content: center; gap: 10px; }
+
+        .modal-box h2 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            color: #1f2937;
+        }
+
+        .modal-box p {
+            margin: 0 0 6px;
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        .modal-actions {
+            margin-top: 18px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
         .btn-stay {
             padding: 8px 16px;
             border: 1px solid #94a3b8;
@@ -391,6 +491,7 @@
             font-weight: 600;
             cursor: pointer;
         }
+
         .btn-confirm-logout {
             padding: 8px 16px;
             border: none;
@@ -403,302 +504,324 @@
         }
     </style>
 </head>
+
 <body>
 
-<header th:replace="~{trang-chu :: header(${nguoiDung})}"></header>
+    <header th:replace="~{app-shell :: header(${nguoiDung})}"></header>
 
-<main class="container">
-    <div class="breadcrumb">
-        <a th:href="@{/trang-chu}">&larr; Quay lại trang chủ</a>
-    </div>
-
-    <section class="panel">
-        <h1 class="page-title">Duyệt đơn cấp 2 và bố trí phòng</h1>
-
-        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-        <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
-
-        <nav class="tabs" aria-label="Trạng thái xử lý cấp 2">
-            <a class="tab-link"
-               th:classappend="${activeTab == 'cho-duyet'} ? ' active' : ''"
-               th:href="@{/duyet-cap-2(tab='cho-duyet')}">Chờ duyệt cấp 2</a>
-            <a class="tab-link"
-               th:classappend="${activeTab == 'da-phe-duyet'} ? ' active' : ''"
-               th:href="@{/duyet-cap-2(tab='da-phe-duyet')}">Đã phê duyệt (Đổi phòng)</a>
-        </nav>
-
-        <div class="empty-state" th:if="${#lists.isEmpty(danhSachDon)}">
-            <span th:if="${activeTab == 'cho-duyet'}">Không có đơn mượn phòng nào đang chờ duyệt cấp 2</span>
-            <span th:if="${activeTab == 'da-phe-duyet'}">Không có đơn đã phê duyệt nào chưa đến giờ sử dụng</span>
+    <main class="container">
+        <div class="breadcrumb">
+            <a th:href="@{/trang-chu}">&larr; Quay lại trang chủ</a>
         </div>
 
-        <div class="table-wrap" th:if="${!#lists.isEmpty(danhSachDon)}">
-            <table>
-                <thead>
-                <tr>
-                    <th>TT</th>
-                    <th>Mã đơn</th>
-                    <th>CLB / Đội nhóm</th>
-                    <th>Sự kiện</th>
-                    <th>Ngày sử dụng</th>
-                    <th>Khung giờ</th>
-                    <th th:text="${activeTab == 'da-phe-duyet'} ? 'Phòng đang bố trí' : 'Phòng mong muốn'">Phòng mong muốn</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="don, stat : ${danhSachDon}"
-                    th:classappend="${donChiTiet != null and donChiTiet.id == don.id} ? 'selected-row' : ''">
-                    <td class="nowrap" th:text="${stat.count}">1</td>
-                    <td class="nowrap" th:text="${don.maDon}">DM-002</td>
-                    <td th:text="${don.donVi != null ? don.donVi.tenCLB : ''}">CLB Tin học</td>
-                    <td th:text="${don.suKien != null ? don.suKien.tenSuKien : ''}">Hội thảo AI</td>
-                    <td class="nowrap" th:text="${#temporals.format(don.ngaySuDung, 'dd/MM/yyyy')}">28/12/2026</td>
-                    <td class="nowrap" th:text="${#temporals.format(don.gioBatDau, 'HH:mm') + ' - ' + #temporals.format(don.gioKetThuc, 'HH:mm')}">14:00 - 17:00</td>
-                    <td>
-                        <div th:if="${activeTab == 'da-phe-duyet'}">
-                            <span th:text="${don.lichSuDungPhong != null and don.lichSuDungPhong.phong != null ? don.lichSuDungPhong.phong.tenPhong + ' (' + don.lichSuDungPhong.phong.maPhong + ')' : 'Chưa bố trí'}"></span>
-                        </div>
-                        <div th:if="${activeTab == 'cho-duyet'}">
-                            <span th:text="${don.loaiPhongMongMuon}">Hội trường</span>
-                            <br>
-                            <small style="color:#64748b"
-                                   th:text="${don.phongMongMuon != null ? don.phongMongMuon.tenPhong : 'Không chỉ định phòng cụ thể'}"></small>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="badge-status"
-                              th:classappend="${don.trangThai.name() == 'DaPheDuyet'} ? ' badge-approved' : ''"
-                              th:text="${don.trangThai.tenHienThi}">Chờ duyệt cấp 2</span>
-                    </td>
-                    <td class="nowrap">
-                        <a class="btn-primary"
-                           th:href="@{/duyet-cap-2(tab=${activeTab}, selectedId=${don.id})}">Xem chi tiết</a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
+        <section class="panel">
+            <h1 class="page-title">Duyệt đơn cấp 2 và bố trí phòng</h1>
 
-    <section class="panel" th:if="${donChiTiet != null}" id="chi-tiet-don">
-        <div class="detail-header">
-            <h2>Chi tiết đơn <span th:text="${donChiTiet.maDon}">DM-002</span></h2>
-            <span class="badge-status"
-                  th:classappend="${donChiTiet.trangThai.name() == 'DaPheDuyet'} ? ' badge-approved' : ''"
-                  th:text="${donChiTiet.trangThai.tenHienThi}">Chờ duyệt cấp 2</span>
-        </div>
+            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
 
-        <div class="detail-grid">
-            <div>
-                <div class="detail-item-label">CLB / Đội nhóm</div>
-                <div class="detail-item-value"
-                     th:text="${donChiTiet.donVi != null ? donChiTiet.donVi.tenCLB + ' (' + donChiTiet.donVi.maDonVi + ')' : ''}"></div>
-            </div>
-            <div>
-                <div class="detail-item-label">Người nộp đơn</div>
-                <div class="detail-item-value"
-                     th:text="${donChiTiet.sinhVien != null ? donChiTiet.sinhVien.hoTen + ' - ' + donChiTiet.sinhVien.maSinhVien : ''}"></div>
-            </div>
-            <div>
-                <div class="detail-item-label">Ngày tạo đơn</div>
-                <div class="detail-item-value" th:text="${#temporals.format(donChiTiet.ngayTao, 'dd/MM/yyyy')}"></div>
-            </div>
-            <div>
-                <div class="detail-item-label">Ngày &amp; khung giờ sử dụng</div>
-                <div class="detail-item-value"
-                     th:text="${#temporals.format(donChiTiet.ngaySuDung, 'dd/MM/yyyy') + ' (' + #temporals.format(donChiTiet.gioBatDau, 'HH:mm') + ' - ' + #temporals.format(donChiTiet.gioKetThuc, 'HH:mm') + ')'}"></div>
-            </div>
-            <div>
-                <div class="detail-item-label">Tên sự kiện</div>
-                <div class="detail-item-value"
-                     th:text="${donChiTiet.suKien != null ? donChiTiet.suKien.tenSuKien : ''}"></div>
-            </div>
-            <div>
-                <div class="detail-item-label">Số người tham dự</div>
-                <div class="detail-item-value"
-                     th:text="${donChiTiet.suKien != null ? donChiTiet.suKien.soNguoiThamDu : 0}"></div>
-            </div>
-            <div>
-                <div class="detail-item-label">Loại phòng mong muốn</div>
-                <div class="detail-item-value" th:text="${donChiTiet.loaiPhongMongMuon}"></div>
-            </div>
-            <div>
-                <div class="detail-item-label">Phòng mong muốn</div>
-                <div class="detail-item-value"
-                     th:text="${donChiTiet.phongMongMuon != null ? donChiTiet.phongMongMuon.tenPhong + ' (' + donChiTiet.phongMongMuon.maPhong + ')' : 'Không chỉ định'}"></div>
-            </div>
-            <div>
-                <div class="detail-item-label">Thiết bị yêu cầu</div>
-                <div class="detail-item-value"
-                     th:text="${!#strings.isEmpty(donChiTiet.thietBiYeuCau) ? donChiTiet.thietBiYeuCau : 'Không có'}"></div>
-            </div>
-            <div th:if="${donChiTiet.lichSuDungPhong != null and donChiTiet.lichSuDungPhong.phong != null}">
-                <div class="detail-item-label">Phòng đang được bố trí</div>
-                <div class="detail-item-value"
-                     th:text="${donChiTiet.lichSuDungPhong.phong.tenPhong + ' (' + donChiTiet.lichSuDungPhong.phong.maPhong + ')'}"></div>
-            </div>
-        </div>
+            <nav class="tabs" aria-label="Trạng thái xử lý cấp 2">
+                <a class="tab-link" th:classappend="${activeTab == 'cho-duyet'} ? ' active' : ''"
+                    th:href="@{/duyet-cap-2(tab='cho-duyet')}">Chờ duyệt cấp 2</a>
+                <a class="tab-link" th:classappend="${activeTab == 'da-phe-duyet'} ? ' active' : ''"
+                    th:href="@{/duyet-cap-2(tab='da-phe-duyet')}">Đổi phòng</a>
+            </nav>
 
-        <div class="detail-block">
-            <div class="detail-item-label">Mục đích sự kiện</div>
-            <div class="detail-item-value"
-                 th:text="${donChiTiet.suKien != null ? donChiTiet.suKien.mucDich : ''}"></div>
-        </div>
+            <div class="empty-state" th:if="${#lists.isEmpty(danhSachDon)}">
+                <span th:if="${activeTab == 'cho-duyet'}">Không có đơn mượn phòng nào đang chờ duyệt cấp 2</span>
+                <span th:if="${activeTab == 'da-phe-duyet'}">Không có đơn đã phê duyệt nào chưa đến giờ sử dụng</span>
+            </div>
 
-        <div class="detail-block">
-            <div class="detail-item-label">Nội dung hoạt động</div>
-            <div class="detail-item-value"
-                 th:text="${donChiTiet.suKien != null ? donChiTiet.suKien.noiDung : ''}"></div>
-        </div>
+            <div class="table-wrap" th:if="${!#lists.isEmpty(danhSachDon)}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>TT</th>
+                            <th>Mã đơn</th>
+                            <th>CLB / Đội nhóm</th>
+                            <th>Sự kiện</th>
+                            <th>Ngày sử dụng</th>
+                            <th th:text="${activeTab == 'da-phe-duyet'} ? 'Phòng đang bố trí' : 'Phòng mong muốn'">Phòng
+                                mong muốn</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="don, stat : ${danhSachDon}"
+                            th:classappend="${donChiTiet != null and donChiTiet.id == don.id} ? 'selected-row' : ''">
+                            <td class="nowrap" th:text="${stat.count}">1</td>
+                            <td class="nowrap" th:text="${don.maDon}">DM-002</td>
+                            <td th:text="${don.donVi != null ? don.donVi.tenCLB : ''}">CLB Tin học</td>
+                            <td th:text="${don.suKien != null ? don.suKien.tenSuKien : ''}">Hội thảo AI</td>
+                            <td class="nowrap">
+                                <span th:text="${don.ngaySuDung != null ? #temporals.format(don.ngaySuDung, 'dd/MM/yyyy') : '—'}">28/12/2026</span>
+                                <div style="color:#64748b;font-size:12px;"
+                                     th:if="${don.gioBatDau != null and don.gioKetThuc != null}"
+                                     th:text="${#temporals.format(don.gioBatDau, 'HH:mm') + ' - ' + #temporals.format(don.gioKetThuc, 'HH:mm')}">14:00 - 17:00</div>
+                            </td>
+                            <td>
+                                <div th:if="${activeTab == 'da-phe-duyet'}">
+                                    <span
+                                        th:text="${don.lichSuDungPhong != null and don.lichSuDungPhong.phong != null ? don.lichSuDungPhong.phong.tenPhong + ' (' + don.lichSuDungPhong.phong.maPhong + ')' : 'Chưa bố trí'}"></span>
+                                </div>
+                                <div th:if="${activeTab == 'cho-duyet'}">
+                                    <span th:text="${don.loaiPhongMongMuon}">Hội trường</span>
+                                    <br>
+                                    <small style="color:#64748b"
+                                        th:text="${don.phongMongMuon != null ? don.phongMongMuon.tenPhong : 'Không chỉ định phòng cụ thể'}"></small>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-status"
+                                    th:classappend="${don.trangThai.name() == 'DaPheDuyet'} ? ' badge-approved' : ''"
+                                    th:text="${don.trangThai.tenHienThi}">Chờ duyệt cấp 2</span>
+                            </td>
+                            <td class="nowrap">
+                                <a class="btn-primary"
+                                    th:href="@{/duyet-cap-2(tab=${activeTab}, selectedId=${don.id})}">Xem chi tiết</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-        <div class="room-check-bar"
-             th:if="${donChiTiet.trangThai.name() == 'ChoDuyetCap2' or donChiTiet.trangThai.name() == 'DaPheDuyet'}">
-            <div>
-                <strong>Kiểm tra phòng trống cùng khung giờ</strong>
-                <div style="font-size:12px;color:#4b5563;margin-top:2px;">
-                    Hệ thống lọc phòng đang hoạt động, đúng loại phòng, đủ sức chứa và không trùng lịch; vui lòng đối chiếu thiết bị thực tế.
+        <section class="panel" th:if="${donChiTiet != null}" id="chi-tiet-don">
+            <div class="detail-header">
+                <h2>Chi tiết đơn <span th:text="${donChiTiet.maDon}">DM-002</span></h2>
+                <span class="badge-status"
+                    th:classappend="${donChiTiet.trangThai.name() == 'DaPheDuyet'} ? ' badge-approved' : ''"
+                    th:text="${donChiTiet.trangThai.tenHienThi}">Chờ duyệt cấp 2</span>
+            </div>
+
+            <div class="detail-grid">
+                <div>
+                    <div class="detail-item-label">CLB / Đội nhóm</div>
+                    <div class="detail-item-value"
+                        th:text="${donChiTiet.donVi != null ? donChiTiet.donVi.tenCLB + ' (' + donChiTiet.donVi.maDonVi + ')' : ''}">
+                    </div>
+                </div>
+                <div>
+                    <div class="detail-item-label">Người nộp đơn</div>
+                    <div class="detail-item-value"
+                        th:text="${donChiTiet.sinhVien != null ? donChiTiet.sinhVien.hoTen + ' - ' + donChiTiet.sinhVien.maSinhVien : ''}">
+                    </div>
+                </div>
+                <div>
+                    <div class="detail-item-label">Ngày tạo đơn</div>
+                    <div class="detail-item-value" th:text="${#temporals.format(donChiTiet.ngayTao, 'dd/MM/yyyy')}">
+                    </div>
+                </div>
+                <div>
+                    <div class="detail-item-label">Ngày &amp; khung giờ sử dụng</div>
+                    <div class="detail-item-value"
+                        th:text="${#temporals.format(donChiTiet.ngaySuDung, 'dd/MM/yyyy') + ' (' + #temporals.format(donChiTiet.gioBatDau, 'HH:mm') + ' - ' + #temporals.format(donChiTiet.gioKetThuc, 'HH:mm') + ')'}">
+                    </div>
+                </div>
+                <div>
+                    <div class="detail-item-label">Tên sự kiện</div>
+                    <div class="detail-item-value"
+                        th:text="${donChiTiet.suKien != null ? donChiTiet.suKien.tenSuKien : ''}"></div>
+                </div>
+                <div>
+                    <div class="detail-item-label">Số người tham dự</div>
+                    <div class="detail-item-value"
+                        th:text="${donChiTiet.suKien != null ? donChiTiet.suKien.soNguoiThamDu : 0}"></div>
+                </div>
+                <div>
+                    <div class="detail-item-label">Loại phòng mong muốn</div>
+                    <div class="detail-item-value" th:text="${donChiTiet.loaiPhongMongMuon}"></div>
+                </div>
+                <div>
+                    <div class="detail-item-label">Phòng mong muốn</div>
+                    <div class="detail-item-value"
+                        th:text="${donChiTiet.phongMongMuon != null ? donChiTiet.phongMongMuon.tenPhong + ' (' + donChiTiet.phongMongMuon.maPhong + ')' : 'Không chỉ định'}">
+                    </div>
+                </div>
+                <div>
+                    <div class="detail-item-label">Thiết bị yêu cầu</div>
+                    <div class="detail-item-value"
+                        th:text="${!#strings.isEmpty(donChiTiet.thietBiYeuCau) ? donChiTiet.thietBiYeuCau : 'Không có'}">
+                    </div>
+                </div>
+                <div th:if="${donChiTiet.lichSuDungPhong != null and donChiTiet.lichSuDungPhong.phong != null}">
+                    <div class="detail-item-label">Phòng đang được bố trí</div>
+                    <div class="detail-item-value"
+                        th:text="${donChiTiet.lichSuDungPhong.phong.tenPhong + ' (' + donChiTiet.lichSuDungPhong.phong.maPhong + ')'}">
+                    </div>
                 </div>
             </div>
-            <a class="btn-primary"
-               th:href="@{/duyet-cap-2(tab=${activeTab}, selectedId=${donChiTiet.id}, checkRooms=true)}">
-                Kiểm tra phòng trống
-            </a>
-        </div>
 
-        <div class="room-section" th:if="${checkedRooms}">
-            <h3>Danh sách phòng trống đáp ứng</h3>
-
-            <div class="empty-state" th:if="${#lists.isEmpty(danhSachPhongTrong)}">
-                Không có phòng trống phù hợp theo tiêu chí loại phòng, sức chứa và khung giờ yêu cầu.
+            <div class="detail-block">
+                <div class="detail-item-label">Mục đích sự kiện</div>
+                <div class="detail-item-value" th:text="${donChiTiet.suKien != null ? donChiTiet.suKien.mucDich : ''}">
+                </div>
             </div>
 
-            <div th:if="${!#lists.isEmpty(danhSachPhongTrong)}">
-                <form th:action="${donChiTiet.trangThai.name() == 'DaPheDuyet'} ? @{/duyet-cap-2/{id}/doi-phong(id=${donChiTiet.id})} : @{/duyet-cap-2/{id}/phe-duyet(id=${donChiTiet.id})}"
-                      method="post">
-                    <div class="table-wrap">
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>TT</th>
-                                <th>Mã phòng</th>
-                                <th>Tên phòng</th>
-                                <th>Sức chứa</th>
-                                <th>Thiết bị</th>
-                                <th>Chọn</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="p, stat : ${danhSachPhongTrong}">
-                                <td class="nowrap" th:text="${stat.count}">1</td>
-                                <td class="nowrap">
-                                    <span th:text="${p.maPhong}">HT-A2</span>
-                                    <span class="badge-wish"
-                                          th:if="${donChiTiet.phongMongMuon != null and donChiTiet.phongMongMuon.id == p.id}">
-                                        Mong muốn
-                                    </span>
-                                </td>
-                                <td th:text="${p.tenPhong}">Hội trường A2</td>
-                                <td class="nowrap" th:text="${p.sucChuaToiDa}">300</td>
-                                <td th:text="${!#strings.isEmpty(p.trangThietBi) ? p.trangThietBi : 'Không có'}">máy chiếu, âm thanh</td>
-                                <td class="nowrap">
-                                    <input type="radio"
-                                           th:name="${donChiTiet.trangThai.name() == 'DaPheDuyet'} ? 'idPhongMoi' : 'idPhong'"
-                                           th:value="${p.id}"
-                                           th:checked="${donChiTiet.trangThai.name() == 'ChoDuyetCap2' and donChiTiet.phongMongMuon != null and donChiTiet.phongMongMuon.id == p.id}">
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div style="margin-top: 14px;">
-                        <button type="submit"
-                                class="btn-approve"
-                                th:text="${donChiTiet.trangThai.name() == 'DaPheDuyet'} ? 'Đổi phòng' : 'Phê duyệt'">Phê duyệt</button>
-                    </div>
-                </form>
+            <div class="detail-block">
+                <div class="detail-item-label">Nội dung hoạt động</div>
+                <div class="detail-item-value" th:text="${donChiTiet.suKien != null ? donChiTiet.suKien.noiDung : ''}">
+                </div>
             </div>
-        </div>
 
-        <div class="decision-section" th:if="${donChiTiet.trangThai.name() == 'ChoDuyetCap2'}">
-            <div class="action-box" th:if="${!checkedRooms or #lists.isEmpty(danhSachPhongTrong)}">
-                <h3>Phê duyệt &amp; bố trí phòng</h3>
-                <p>Nhấn <strong>Kiểm tra phòng trống</strong> ở trên để xem và chọn phòng khả dụng trước khi phê duyệt.</p>
+            <div class="room-check-bar"
+                th:if="${donChiTiet.trangThai.name() == 'ChoDuyetCap2' or donChiTiet.trangThai.name() == 'DaPheDuyet'}">
+                <div>
+                    <strong>Kiểm tra phòng trống cùng khung giờ</strong>
+                    <div style="font-size:12px;color:#4b5563;margin-top:2px;">
+                        Hệ thống lọc phòng đang hoạt động, đúng loại phòng, đủ sức chứa và không trùng lịch; vui lòng
+                        đối chiếu thiết bị thực tế.
+                    </div>
+                </div>
                 <a class="btn-primary"
-                   th:href="@{/duyet-cap-2(tab=${activeTab}, selectedId=${donChiTiet.id}, checkRooms=true)}">
+                    th:href="@{/duyet-cap-2(tab=${activeTab}, selectedId=${donChiTiet.id}, checkRooms=true)}">
                     Kiểm tra phòng trống
                 </a>
             </div>
 
-            <div class="action-box">
-                <h3>Từ chối đơn cấp 2</h3>
-                <p>Thực hiện khi không có phòng phù hợp hoặc không bố trí được phòng cho đơn.</p>
-                <form class="reject-form" th:action="@{/duyet-cap-2/{id}/tu-choi(id=${donChiTiet.id})}" method="post">
-                    <input type="hidden" name="checkRooms" th:value="${checkedRooms}">
-                    <label for="lyDo">Lý do từ chối (khi không có phòng phù hợp) <span style="color:#b91c1c">*</span></label>
-                    <textarea id="lyDo" name="lyDo" rows="3"
-                              placeholder="Nhập lý do từ chối (bắt buộc)..."
-                              th:text="${lyDoDraft}"></textarea>
-                    <button type="submit" class="btn-reject">Từ chối</button>
-                </form>
-            </div>
-        </div>
+            <div class="room-section" th:if="${checkedRooms}">
+                <h3>Danh sách phòng trống đáp ứng</h3>
 
-        <div class="history-grid">
-            <div class="history-box">
-                <h3>Thông tin lượt duyệt</h3>
-                <div class="empty-state" th:if="${#lists.isEmpty(donChiTiet.luotDuyets)}">Chưa có lượt duyệt nào</div>
-                <div class="table-wrap" th:if="${!#lists.isEmpty(donChiTiet.luotDuyets)}">
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Cấp</th>
-                            <th>Kết quả</th>
-                            <th>Lý do</th>
-                            <th>Người duyệt</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="ld : ${donChiTiet.luotDuyets}">
-                            <td class="nowrap" th:text="${'Cấp ' + ld.capDuyet}">Cấp 1</td>
-                            <td class="nowrap" th:text="${ld.ketQua}">Chấp thuận</td>
-                            <td th:text="${!#strings.isEmpty(ld.lyDo) ? ld.lyDo : '—'}">—</td>
-                            <td th:text="${ld.nguoiDuyet != null ? ld.nguoiDuyet.hoTen : ''}">Cán bộ</td>
-                        </tr>
-                        </tbody>
-                    </table>
+                <div class="empty-state" th:if="${#lists.isEmpty(danhSachPhongTrong)}">
+                    Không có phòng trống phù hợp theo tiêu chí loại phòng, sức chứa và khung giờ yêu cầu.
+                </div>
+
+                <div th:if="${!#lists.isEmpty(danhSachPhongTrong)}">
+                    <form
+                        th:action="${donChiTiet.trangThai.name() == 'DaPheDuyet'} ? @{/duyet-cap-2/{id}/doi-phong(id=${donChiTiet.id})} : @{/duyet-cap-2/{id}/phe-duyet(id=${donChiTiet.id})}"
+                        method="post">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>TT</th>
+                                        <th>Mã phòng</th>
+                                        <th>Tên phòng</th>
+                                        <th>Sức chứa</th>
+                                        <th>Thiết bị</th>
+                                        <th>Chọn</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="p, stat : ${danhSachPhongTrong}">
+                                        <td class="nowrap" th:text="${stat.count}">1</td>
+                                        <td class="nowrap">
+                                            <span th:text="${p.maPhong}">HT-A2</span>
+                                            <span class="badge-wish"
+                                                th:if="${donChiTiet.phongMongMuon != null and donChiTiet.phongMongMuon.id == p.id}">
+                                                Mong muốn
+                                            </span>
+                                        </td>
+                                        <td th:text="${p.tenPhong}">Hội trường A2</td>
+                                        <td class="nowrap" th:text="${p.sucChuaToiDa}">300</td>
+                                        <td
+                                            th:text="${!#strings.isEmpty(p.trangThietBi) ? p.trangThietBi : 'Không có'}">
+                                            máy chiếu, âm thanh</td>
+                                        <td class="nowrap">
+                                            <input type="radio"
+                                                th:name="${donChiTiet.trangThai.name() == 'DaPheDuyet'} ? 'idPhongMoi' : 'idPhong'"
+                                                th:value="${p.id}"
+                                                th:checked="${donChiTiet.trangThai.name() == 'ChoDuyetCap2' and donChiTiet.phongMongMuon != null and donChiTiet.phongMongMuon.id == p.id}">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div style="margin-top: 14px;">
+                            <button type="submit" class="btn-approve"
+                                th:text="${donChiTiet.trangThai.name() == 'DaPheDuyet'} ? 'Đổi phòng' : 'Phê duyệt'">Phê
+                                duyệt</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
-            <div class="history-box">
-                <h3>Lịch sử thay đổi đơn</h3>
-                <div class="empty-state" th:if="${#lists.isEmpty(donChiTiet.lichSuDons)}">Chưa có lịch sử đơn</div>
-                <div class="table-wrap" th:if="${!#lists.isEmpty(donChiTiet.lichSuDons)}">
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Thời điểm</th>
-                            <th>Trạng thái</th>
-                            <th>Ghi chú xử lý</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="ls : ${donChiTiet.lichSuDons}">
-                            <td class="nowrap" th:text="${#temporals.format(ls.thoiDiem, 'dd/MM/yyyy HH:mm')}">18/11/2026 09:00</td>
-                            <td class="nowrap" th:text="${ls.trangThaiMoi != null ? ls.trangThaiMoi.tenHienThi : ''}">Chờ duyệt cấp 2</td>
-                            <td th:text="${ls.ghiChu}">Ghi chú</td>
-                        </tr>
-                        </tbody>
-                    </table>
+            <div class="decision-section" th:if="${donChiTiet.trangThai.name() == 'ChoDuyetCap2'}">
+                <div class="action-box" th:if="${!checkedRooms or #lists.isEmpty(danhSachPhongTrong)}">
+                    <h3>Phê duyệt &amp; bố trí phòng</h3>
+                    <p>Nhấn <strong>Kiểm tra phòng trống</strong> ở trên để xem và chọn phòng khả dụng trước khi phê
+                        duyệt.</p>
+                    <a class="btn-primary"
+                        th:href="@{/duyet-cap-2(tab=${activeTab}, selectedId=${donChiTiet.id}, checkRooms=true)}">
+                        Kiểm tra phòng trống
+                    </a>
+                </div>
+
+                <div class="action-box">
+                    <h3>Từ chối đơn cấp 2</h3>
+                    <p>Thực hiện khi không có phòng phù hợp hoặc không bố trí được phòng cho đơn.</p>
+                    <form class="reject-form" th:action="@{/duyet-cap-2/{id}/tu-choi(id=${donChiTiet.id})}"
+                        method="post">
+                        <input type="hidden" name="checkRooms" th:value="${checkedRooms}">
+                        <label for="lyDo">Lý do từ chối (khi không có phòng phù hợp) <span
+                                style="color:#b91c1c">*</span></label>
+                        <textarea id="lyDo" name="lyDo" rows="3" placeholder="Nhập lý do từ chối (bắt buộc)..."
+                            th:text="${lyDoDraft}"></textarea>
+                        <button type="submit" class="btn-reject">Từ chối</button>
+                    </form>
                 </div>
             </div>
-        </div>
-    </section>
-</main>
 
-<div th:replace="~{trang-chu :: logoutModal}"></div>
+            <div class="history-grid">
+                <div class="history-box">
+                    <h3>Thông tin lượt duyệt</h3>
+                    <div class="empty-state" th:if="${#lists.isEmpty(donChiTiet.luotDuyets)}">Chưa có lượt duyệt nào
+                    </div>
+                    <div class="table-wrap" th:if="${!#lists.isEmpty(donChiTiet.luotDuyets)}">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cấp</th>
+                                    <th>Kết quả</th>
+                                    <th>Lý do</th>
+                                    <th>Người duyệt</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="ld : ${donChiTiet.luotDuyets}">
+                                    <td class="nowrap" th:text="${'Cấp ' + ld.capDuyet}">Cấp 1</td>
+                                    <td class="nowrap" th:text="${ld.ketQua}">Chấp thuận</td>
+                                    <td th:text="${!#strings.isEmpty(ld.lyDo) ? ld.lyDo : '—'}">—</td>
+                                    <td th:text="${ld.nguoiDuyet != null ? ld.nguoiDuyet.hoTen : ''}">Cán bộ</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="history-box">
+                    <h3>Lịch sử thay đổi đơn</h3>
+                    <div class="empty-state" th:if="${#lists.isEmpty(donChiTiet.lichSuDons)}">Chưa có lịch sử đơn</div>
+                    <div class="table-wrap" th:if="${!#lists.isEmpty(donChiTiet.lichSuDons)}">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Thời điểm</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ghi chú xử lý</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="ls : ${donChiTiet.lichSuDons}">
+                                    <td class="nowrap" th:text="${#temporals.format(ls.thoiDiem, 'dd/MM/yyyy HH:mm')}">
+                                        18/11/2026 09:00</td>
+                                    <td class="nowrap"
+                                        th:text="${ls.trangThaiMoi != null ? ls.trangThaiMoi.tenHienThi : ''}">Chờ duyệt
+                                        cấp 2</td>
+                                    <td th:text="${ls.ghiChu}">Ghi chú</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div th:replace="~{app-shell :: logoutModal}"></div>
 
 </body>
+
 </html>

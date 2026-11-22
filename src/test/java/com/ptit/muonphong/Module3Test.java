@@ -122,12 +122,17 @@ class Module3Test {
                 mockMvc.perform(get("/quan-ly-phong").with(user(new CustomUserDetails(createCanBoCSVC()))))
                                 .andExpect(status().isOk())
                                 .andExpect(view().name("quan-ly-phong"))
+                                .andExpect(content().string(containsString("Hệ thống mượn phòng trực tuyến PTIT")))
+                                .andExpect(content().string(containsString("id=\"logoutModal\"")))
                                 .andExpect(content().string(containsString("Quản lý danh mục phòng")))
                                 .andExpect(content().string(containsString("HT-A2")))
                                 .andExpect(content().string(containsString("Hội trường A3")))
                                 .andExpect(content().string(containsString("href=\"/quan-ly-phong?suaId=1&amp;tuKhoa=#formPhongSection\"")))
                                 .andExpect(content().string(containsString("href=\"/quan-ly-phong?ngungId=1&amp;tuKhoa=\"")))
-                                .andExpect(content().string(containsString("Form thêm phòng mới")));
+                                .andExpect(content().string(containsString("Form thêm phòng mới")))
+                                .andExpect(content().string(containsString(">Lưu<")))
+                                .andExpect(content().string(not(containsString(">Làm mới<"))))
+                                .andExpect(content().string(not(containsString(">Hủy sửa<"))));
 
                 mockMvc.perform(get("/quan-ly-phong")
                                 .param("tuKhoa", "A2")
@@ -344,7 +349,10 @@ class Module3Test {
                                 .andExpect(model().attribute("editMode", true))
                                 .andExpect(content().string(containsString("Form sửa thông tin phòng")))
                                 .andExpect(content().string(containsString("readonly=\"readonly\"")))
-                                .andExpect(content().string(containsString("Ngưng sử dụng")));
+                                .andExpect(content().string(containsString("Ngưng sử dụng")))
+                                .andExpect(content().string(containsString(">Lưu<")))
+                                .andExpect(content().string(not(containsString(">Hủy sửa<"))))
+                                .andExpect(content().string(not(containsString(">Làm mới<"))));
 
                 when(phongService.getChiTiet(999)).thenReturn(null);
                 mockMvc.perform(get("/quan-ly-phong")

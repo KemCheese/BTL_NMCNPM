@@ -59,7 +59,7 @@ class Module2Test {
         sv.setTenDangNhap(id == 1 ? "sv_an" : "sv_khoa");
         sv.setHoTen(id == 1 ? "Nguyễn Văn An" : "Phạm Minh Khóa");
         sv.setMaSinhVien(id == 1 ? "B22DCCN001" : "B22DCCN002");
-        sv.setKhoaHoc(2022);
+        sv.setKhoaHoc("2022");
         sv.setNganhHoc("Công nghệ thông tin");
         sv.setTrangThai("Hoạt động");
         sv.setDonVi(dv);
@@ -317,7 +317,9 @@ class Module2Test {
             mockMvc.perform(get("/duyet-cap-1").with(user(cbBinh)))
                     .andExpect(status().isOk())
                     .andExpect(content().string(containsString("Hệ thống mượn phòng trực tuyến PTIT")))
-                    .andExpect(content().string(containsString("id=\"logoutModal\"")))
+                    .andExpect(content().string(containsString("href=\"/xac-nhan-dang-xuat\"")))
+                    .andExpect(content().string(not(containsString("id=\"logoutModal\""))))
+                    .andExpect(content().string(not(containsString("openLogoutModal"))))
                     .andExpect(content().string(containsString("Duyệt đơn cấp 1")))
                     .andExpect(content().string(containsString("DM-001")))
                     .andExpect(content().string(containsString("DM-004")))
@@ -690,7 +692,9 @@ class Module2Test {
                             .with(user(cbCuong)))
                     .andExpect(status().isOk())
                     .andExpect(content().string(containsString("Hệ thống mượn phòng trực tuyến PTIT")))
-                    .andExpect(content().string(containsString("id=\"logoutModal\"")))
+                    .andExpect(content().string(containsString("href=\"/xac-nhan-dang-xuat\"")))
+                    .andExpect(content().string(not(containsString("id=\"logoutModal\""))))
+                    .andExpect(content().string(not(containsString("openLogoutModal"))))
                     .andExpect(content().string(containsString("Duyệt đơn cấp 2 và bố trí phòng")))
                     .andExpect(content().string(containsString("DM-002")))
                     .andExpect(content().string(containsString("14:00 - 17:00")))

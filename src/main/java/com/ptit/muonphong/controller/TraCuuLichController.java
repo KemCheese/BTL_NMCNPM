@@ -23,12 +23,14 @@ public class TraCuuLichController {
     }
 
     @GetMapping
-    public String traCuuLich(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ngay,
-                             @RequestParam(required = false) String loaiPhong,
-                             @RequestParam(required = false) Integer sucChua,
-                             @RequestParam(required = false) String tinhTrang,
-                             @RequestParam(required = false) String notFound,
-                             Model model) {
+    public String traCuuLich(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ngay,
+            @RequestParam(required = false) String loaiPhong,
+            @RequestParam(required = false) Integer sucChua,
+            @RequestParam(required = false) String tinhTrang,
+            @RequestParam(required = false) Integer selectedId,
+            @RequestParam(required = false) String notFound,
+            Model model) {
         LocalDate ngayTraCuu = ngay != null ? ngay : LocalDate.now();
         String loaiPhongLoc = loaiPhong != null ? loaiPhong.trim() : "";
         String tinhTrangLoc = tinhTrang != null ? tinhTrang.trim() : "";
@@ -42,34 +44,58 @@ public class TraCuuLichController {
             sucChuaHopLe = null;
         }
 
-        List<PhongLichItem> ketQuaList = traCuuLichService.traCuuLich(
-                ngayTraCuu, loaiPhongLoc, sucChuaHopLe, tinhTrangLoc);
+        PhongLichItem chiTiet = null;
+        Integer selectedIdHopLe = null;
+        if (selectedId != null) {
+            chiTiet = traCuuLichService.getChiTietPhong(selectedId, ngayTraCuu);
+            if (chiTiet != null) {
+                selectedIdHopLe = selectedId;
+            } else if (errorMessage == null) {
+                errorMessage = "Không tìm thấy thông tin phòng được yêu cầu.";
+            }
+        }
 
-        model.addAttribute("nguoiDung", authService.getCurrentUser());
-        model.addAttribute("ngay", ngayTraCuu);
-        model.addAttribute("loaiPhong", loaiPhongLoc);
-        model.addAttribute("sucChua", sucChua);
-        model.addAttribute("tinhTrang", tinhTrangLoc);
-        model.addAttribute("dsLoaiPhong", traCuuLichService.getDanhSachLoaiPhong());
-        model.addAttribute("dsTinhTrang", traCuuLichService.getDanhSachTinhTrang());
-        model.addAttribute("ketQuaList", ketQuaList);
-        model.addAttribute("errorMessage", errorMessage);
-        return "tra-cuu-lich";
+        return renderTraCuuLich(
+                ngayTraCuu, loaiPhongLoc, sucChua, sucChuaHopLe, tinhTrangLoc,
+                selectedIdHopLe, chiTiet, errorMessage, model);
     }
 
     @GetMapping("/{idPhong}")
     public String xemChiTietPhong(@PathVariable int idPhong,
-                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ngay,
-                                  Model model) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ngay,
+            Model model) {
         LocalDate ngayTraCuu = ngay != null ? ngay : LocalDate.now();
         PhongLichItem chiTiet = traCuuLichService.getChiTietPhong(idPhong, ngayTraCuu);
         if (chiTiet == null) {
             return "redirect:/tra-cuu-lich?notFound=true";
         }
 
+        return renderTraCuuLich(ngayTraCuu, "", null, null, "", idPhong, chiTiet, null, model);
+    }
+
+    private String renderTraCuuLich(LocalDate ngayTraCuu,
+                                    String loaiPhongLoc,
+                                    Integer sucChuaInput,
+                                    Integer sucChuaHopLe,
+                                    String tinhTrangLoc,
+                                    Integer selectedId,
+                                    PhongLichItem chiTiet,
+                                    String errorMessage,
+                                    Model model) {
+        List<PhongLichItem> ketQuaList = traCuuLichService.traCuuLich(
+                ngayTraCuu, loaiPhongLoc, sucChuaHopLe, tinhTrangLoc);
+
         model.addAttribute("nguoiDung", authService.getCurrentUser());
         model.addAttribute("ngay", ngayTraCuu);
+        model.addAttribute("loaiPhong", loaiPhongLoc);
+        model.addAttribute("sucChua", sucChuaInput);
+        model.addAttribute("tinhTrang", tinhTrangLoc);
+        model.addAttribute("dsLoaiPhong", traCuuLichService.getDanhSachLoaiPhong());
+        model.addAttribute("dsTinhTrang", traCuuLichService.getDanhSachTinhTrang());
+        model.addAttribute("ketQuaList", ketQuaList);
+        model.addAttribute("selectedId", selectedId);
         model.addAttribute("chiTiet", chiTiet);
-        return "chi-tiet-phong";
+        model.addAttribute("errorMessage", errorMessage);
+        return "tra-cuu-lich";
     }
 }

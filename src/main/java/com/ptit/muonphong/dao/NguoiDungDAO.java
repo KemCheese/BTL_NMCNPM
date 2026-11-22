@@ -55,7 +55,7 @@ public class NguoiDungDAO {
             if (rs.getString("maSinhVien") != null) {
                 SinhVien sv = new SinhVien();
                 sv.setMaSinhVien(rs.getString("maSinhVien"));
-                sv.setKhoaHoc(rs.getInt("khoaHoc"));
+                sv.setKhoaHoc(rs.getString("khoaHoc"));
                 sv.setNganhHoc(rs.getString("nganhHoc"));
                 int donViId = rs.getInt("donViId");
                 if (!rs.wasNull()) {

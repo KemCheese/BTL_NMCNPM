@@ -464,7 +464,7 @@ public class DonMuonPhongDAO {
             sv.setSoDienThoai(rs.getString("svSoDienThoai"));
             sv.setTrangThai(rs.getString("svTrangThai"));
             sv.setMaSinhVien(rs.getString("maSinhVien"));
-            sv.setKhoaHoc(rs.getInt("khoaHoc"));
+            sv.setKhoaHoc(rs.getString("khoaHoc"));
             sv.setNganhHoc(rs.getString("nganhHoc"));
             sv.setDonVi(donVi);
             don.setSinhVien(sv);

@@ -30,7 +30,7 @@ CREATE TABLE `tblDonVi` (
 CREATE TABLE `tblSinhVien` (
     `id` INT NOT NULL,
     `maSinhVien` VARCHAR(50) NOT NULL,
-    `khoaHoc` INT NOT NULL,
+    `khoaHoc` VARCHAR(20) NOT NULL,
     `nganhHoc` VARCHAR(150) NOT NULL,
     `donViId` INT NOT NULL,
     PRIMARY KEY (`id`),

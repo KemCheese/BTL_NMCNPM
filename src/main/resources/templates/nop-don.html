@@ -314,7 +314,7 @@
 </head>
 <body>
 
-<div th:replace="~{trang-chu :: header(${nguoiDung})}"></div>
+<div th:replace="~{app-shell :: header(${nguoiDung})}"></div>
 
 <main class="container">
     <section class="panel">
@@ -442,14 +442,10 @@
             </div>
 
             <div class="skip-room-box" th:if="${daTimKiem}">
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <input type="radio" name="phongId" value="" th:checked="${form.phongId == null}">
-                    <span>Có thể bỏ qua việc chọn phòng để Trung tâm tự bố trí</span>
-                </label>
+                <span>Bỏ qua và chọn tiếp tục để Trung tâm bố trí</span>
             </div>
 
             <div class="form-actions">
-                <a class="btn-secondary" th:href="@{/nop-don}">Đặt lại</a>
                 <button type="submit"
                         class="btn-primary"
                         th:formaction="@{/nop-don/buoc-2}"
@@ -540,7 +536,29 @@
     </section>
 </main>
 
-<div th:replace="~{trang-chu :: logoutModal}"></div>
+<div th:replace="~{app-shell :: logoutModal}"></div>
+
+<script>
+    (function () {
+        var radios = document.querySelectorAll('input[type="radio"][name="phongId"]');
+        radios.forEach(function (radio) {
+            radio.addEventListener('pointerdown', function () {
+                this.dataset.wasChecked = this.checked ? 'true' : 'false';
+            });
+            radio.addEventListener('keydown', function (event) {
+                if (event.key === ' ' || event.code === 'Space') {
+                    this.dataset.wasChecked = this.checked ? 'true' : 'false';
+                }
+            });
+            radio.addEventListener('click', function () {
+                if (this.dataset.wasChecked === 'true') {
+                    this.checked = false;
+                    this.dataset.wasChecked = 'false';
+                }
+            });
+        });
+    })();
+</script>
 
 </body>
 </html>

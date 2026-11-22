@@ -93,7 +93,7 @@ public class LichSuDungPhongDAO {
         return jdbcTemplate.update(sql, idDon);
     }
 
-    public List<ThongKeDong> thongKe(String tieuChi, LocalDate tuNgay, LocalDate denNgay) {
+    public List<BaoCaoService.ThongKeDon> thongKe(String tieuChi, LocalDate tuNgay, LocalDate denNgay) {
         if (!BaoCaoService.laTieuChiTheoPhongHopLe(tieuChi)
                 || tuNgay == null
                 || denNgay == null
@@ -119,7 +119,7 @@ public class LichSuDungPhongDAO {
             int soLuot = rs.getInt("soLuot");
             double tongGio = BaoCaoService.lamTronHaiChuSo(rs.getDouble("tongGio"));
             double tyLe = BaoCaoService.tinhTyLeSuDung(tongGio, tuNgay, denNgay);
-            return new ThongKeDong(phong, soLuot, tongGio, tyLe);
+            return new BaoCaoService.ThongKeDon(phong, soLuot, tongGio, tyLe);
         }, TrangThaiDon.DaPheDuyet.name(), Date.valueOf(tuNgay), Date.valueOf(denNgay));
     }
 

@@ -1,6 +1,5 @@
 package com.ptit.muonphong.controller;
 
-import com.ptit.muonphong.entity.ThongKeDong;
 import com.ptit.muonphong.service.AuthService;
 import com.ptit.muonphong.service.BaoCaoService;
 import org.springframework.dao.DataAccessException;
@@ -42,7 +41,7 @@ public class BaoCaoController {
             effectiveDenNgay = today.withDayOfMonth(today.lengthOfMonth());
         }
 
-        List<ThongKeDong> dsThongKe = Collections.emptyList();
+        List<BaoCaoService.ThongKeDon> dsThongKe = Collections.emptyList();
         boolean coLoiChung = false;
         try {
             dsThongKe = baoCaoService.xemBaoCaoTheoPhong(tieuChi, effectiveTuNgay, effectiveDenNgay);
@@ -70,7 +69,7 @@ public class BaoCaoController {
         double maxTongGio = 0.0;
         int tongLuotTatCa = 0;
         double tongGioTatCa = 0.0;
-        for (ThongKeDong row : dsThongKe) {
+        for (BaoCaoService.ThongKeDon row : dsThongKe) {
             if (row.getTongGio() > maxTongGio) {
                 maxTongGio = row.getTongGio();
             }

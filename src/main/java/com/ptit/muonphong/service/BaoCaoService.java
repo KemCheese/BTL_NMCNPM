@@ -5,9 +5,9 @@ import com.ptit.muonphong.dao.LichSuDungPhongDAO;
 import com.ptit.muonphong.dao.PhongDAO;
 import com.ptit.muonphong.entity.DonMuonPhong;
 import com.ptit.muonphong.entity.Phong;
-import com.ptit.muonphong.entity.ThongKeDong;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
@@ -39,28 +39,28 @@ public class BaoCaoService {
         this.donMuonPhongDAO = donMuonPhongDAO;
     }
 
-    public List<ThongKeDong> xemBaoCaoTheoPhong(String tieuChi, LocalDate tuNgay, LocalDate denNgay) {
+    public List<ThongKeDon> xemBaoCaoTheoPhong(String tieuChi, LocalDate tuNgay, LocalDate denNgay) {
         if (!laTieuChiTheoPhongHopLe(tieuChi)) {
             throw new IllegalArgumentException("Hệ thống hiện chỉ hỗ trợ tiêu chí thống kê Theo phòng.");
         }
         kiemTraKhoangNgay(tuNgay, denNgay);
 
-        List<ThongKeDong> rawRows = lichSuDungPhongDAO.thongKe(TIEU_CHI_THEO_PHONG, tuNgay, denNgay);
+        List<ThongKeDon> rawRows = lichSuDungPhongDAO.thongKe(TIEU_CHI_THEO_PHONG, tuNgay, denNgay);
         if (rawRows == null || rawRows.isEmpty()) {
             return List.of();
         }
 
-        List<ThongKeDong> result = new ArrayList<>();
-        for (ThongKeDong row : rawRows) {
+        List<ThongKeDon> result = new ArrayList<>();
+        for (ThongKeDon row : rawRows) {
             if (row == null) {
                 continue;
             }
             double tongGio = lamTronHaiChuSo(row.getTongGio());
             double tyLe = tinhTyLeSuDung(tongGio, tuNgay, denNgay);
-            result.add(new ThongKeDong(row.getPhong(), row.getSoLuot(), tongGio, tyLe));
+            result.add(new ThongKeDon(row.getPhong(), row.getSoLuot(), tongGio, tyLe));
         }
-        result.sort(Comparator.comparingDouble(ThongKeDong::getTongGio).reversed()
-                .thenComparing(Comparator.comparingInt(ThongKeDong::getSoLuot).reversed()));
+        result.sort(Comparator.comparingDouble(ThongKeDon::getTongGio).reversed()
+                .thenComparing(Comparator.comparingInt(ThongKeDon::getSoLuot).reversed()));
         return result;
     }
 
@@ -112,6 +112,57 @@ public class BaoCaoService {
         return BigDecimal.valueOf(phut)
                 .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP)
                 .doubleValue();
+    }
+
+    public static class ThongKeDon implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        private Phong phong;
+        private int soLuot;
+        private double tongGio;
+        private double tyLeSuDung;
+
+        public ThongKeDon() {
+        }
+
+        public ThongKeDon(Phong phong, int soLuot, double tongGio, double tyLeSuDung) {
+            this.phong = phong;
+            this.soLuot = soLuot;
+            this.tongGio = tongGio;
+            this.tyLeSuDung = tyLeSuDung;
+        }
+
+        public Phong getPhong() {
+            return phong;
+        }
+
+        public void setPhong(Phong phong) {
+            this.phong = phong;
+        }
+
+        public int getSoLuot() {
+            return soLuot;
+        }
+
+        public void setSoLuot(int soLuot) {
+            this.soLuot = soLuot;
+        }
+
+        public double getTongGio() {
+            return tongGio;
+        }
+
+        public void setTongGio(double tongGio) {
+            this.tongGio = tongGio;
+        }
+
+        public double getTyLeSuDung() {
+            return tyLeSuDung;
+        }
+
+        public void setTyLeSuDung(double tyLeSuDung) {
+            this.tyLeSuDung = tyLeSuDung;
+        }
     }
 
     public static class ChiTietPhongBaoCao {

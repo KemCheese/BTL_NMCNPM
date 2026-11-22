@@ -316,10 +316,16 @@ class Module2Test {
 
             mockMvc.perform(get("/duyet-cap-1").with(user(cbBinh)))
                     .andExpect(status().isOk())
+                    .andExpect(content().string(containsString("Hệ thống mượn phòng trực tuyến PTIT")))
+                    .andExpect(content().string(containsString("id=\"logoutModal\"")))
                     .andExpect(content().string(containsString("Duyệt đơn cấp 1")))
                     .andExpect(content().string(containsString("DM-001")))
                     .andExpect(content().string(containsString("DM-004")))
+                    .andExpect(content().string(containsString("25/12/2026")))
+                    .andExpect(content().string(containsString("18:00 - 21:00")))
                     .andExpect(content().string(containsString("Chờ duyệt cấp 1")))
+                    .andExpect(content().string(not(containsString("<th>Khung giờ</th>"))))
+                    .andExpect(content().string(not(containsString(">Đặt lại<"))))
                     .andExpect(content().string(not(containsString("Ghi chú"))));
 
             mockMvc.perform(get("/duyet-cap-1").param("tenCLB", "CLB Tin học").with(user(cbBinh)))
@@ -683,8 +689,12 @@ class Module2Test {
                             .param("checkRooms", "true")
                             .with(user(cbCuong)))
                     .andExpect(status().isOk())
+                    .andExpect(content().string(containsString("Hệ thống mượn phòng trực tuyến PTIT")))
+                    .andExpect(content().string(containsString("id=\"logoutModal\"")))
                     .andExpect(content().string(containsString("Duyệt đơn cấp 2 và bố trí phòng")))
                     .andExpect(content().string(containsString("DM-002")))
+                    .andExpect(content().string(containsString("14:00 - 17:00")))
+                    .andExpect(content().string(not(containsString("<th>Khung giờ</th>"))))
                     .andExpect(content().string(containsString("HT-A2")))
                     .andExpect(content().string(containsString("máy chiếu, âm thanh")))
                     .andExpect(content().string(containsString("Phê duyệt")))
@@ -755,6 +765,9 @@ class Module2Test {
                             .with(user(cbCuong)))
                     .andExpect(status().isOk())
                     .andExpect(content().string(containsString("DM-003")))
+                    .andExpect(content().string(containsString("30/12/2027")))
+                    .andExpect(content().string(containsString("14:00 - 17:00")))
+                    .andExpect(content().string(not(containsString("<th>Khung giờ</th>"))))
                     .andExpect(content().string(containsString("HT-B1")))
                     .andExpect(content().string(containsString("Đổi phòng")));
 

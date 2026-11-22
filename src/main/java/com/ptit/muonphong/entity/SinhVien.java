@@ -4,7 +4,7 @@ public class SinhVien extends NguoiDung {
     private static final long serialVersionUID = 1L;
 
     private String maSinhVien;
-    private int khoaHoc;
+    private String khoaHoc;
     private String nganhHoc;
     private DonVi donVi;
 
@@ -26,11 +26,11 @@ public class SinhVien extends NguoiDung {
         this.maSinhVien = maSinhVien;
     }
 
-    public int getKhoaHoc() {
+    public String getKhoaHoc() {
         return khoaHoc;
     }
 
-    public void setKhoaHoc(int khoaHoc) {
+    public void setKhoaHoc(String khoaHoc) {
         this.khoaHoc = khoaHoc;
     }
 

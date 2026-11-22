@@ -149,13 +149,22 @@ class Module0Test {
                 mockMvc.perform(get("/trang-chu").session(session))
                                 .andExpect(status().isOk())
                                 .andExpect(content().string(containsString("Hệ thống mượn phòng trực tuyến PTIT")))
-                                .andExpect(content().string(containsString("id=\"logoutModal\"")))
+                                .andExpect(content().string(containsString("href=\"/xac-nhan-dang-xuat\"")))
+                                .andExpect(content().string(not(containsString("id=\"logoutModal\""))))
+                                .andExpect(content().string(not(containsString("openLogoutModal"))))
                                 .andExpect(content().string(containsString("NGƯỜI MƯỢN")))
                                 .andExpect(content().string(containsString("Tra cứu lịch phòng")))
                                 .andExpect(content().string(containsString("Nộp đơn")))
                                 .andExpect(content().string(containsString("Theo dõi đơn")))
                                 .andExpect(content().string(not(containsString("Duyệt đơn"))))
                                 .andExpect(content().string(not(containsString("Duyệt đơn và bố trí phòng"))));
+
+                mockMvc.perform(get("/xac-nhan-dang-xuat").session(session))
+                                .andExpect(status().isOk())
+                                .andExpect(view().name("xac-nhan-dang-xuat"))
+                                .andExpect(content().string(containsString("Xác nhận đăng xuất")))
+                                .andExpect(content().string(containsString("href=\"/trang-chu\"")))
+                                .andExpect(content().string(containsString("action=\"/logout\"")));
 
                 mockMvc.perform(get("/duyet-cap-1").session(session))
                                 .andExpect(status().isForbidden())

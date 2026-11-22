@@ -197,13 +197,17 @@ class Module1Test {
                         .param("sucChua", "100")
                         .param("tinhTrang", ""))
                 .andExpect(status().isOk())
+                .andExpect(view().name("tra-cuu-lich"))
                 .andExpect(content().string(containsString("Hệ thống mượn phòng trực tuyến PTIT")))
-                .andExpect(content().string(containsString("id=\"logoutModal\"")))
+                .andExpect(content().string(containsString("href=\"/xac-nhan-dang-xuat\"")))
+                .andExpect(content().string(not(containsString("id=\"logoutModal\""))))
+                .andExpect(content().string(not(containsString("openLogoutModal"))))
                 .andExpect(content().string(containsString("Tra cứu lịch phòng")))
                 .andExpect(content().string(containsString("Hội trường A2")))
                 .andExpect(content().string(containsString("08:00 - 11:00")))
-                .andExpect(content().string(containsString("/tra-cuu-lich/1?ngay=2026-12-30")))
+                .andExpect(content().string(containsString("selectedId=1#chiTietPhongSection")))
                 .andExpect(content().string(containsString("Hội trường A3")))
+                .andExpect(content().string(not(containsString("id=\"chiTietPhongSection\""))))
                 .andExpect(content().string(not(containsString("/nop-don?phongId="))))
                 .andExpect(content().string(not(containsString(">Nộp đơn<"))))
                 .andExpect(content().string(not(containsString(">Đặt lại<"))));
@@ -222,6 +226,7 @@ class Module1Test {
                         .param("ngay", "2026-12-30")
                         .param("sucChua", "0"))
                 .andExpect(status().isOk())
+                .andExpect(view().name("tra-cuu-lich"))
                 .andExpect(content().string(containsString("Sức chứa tối thiểu phải lớn hơn 0.")));
     }
 
@@ -229,17 +234,48 @@ class Module1Test {
     void viewRoomDetailShowsScheduleAndNotFoundRedirects() throws Exception {
         LocalDate ngay = LocalDate.of(2026, 12, 30);
         Phong htA2 = createPhong(1, "HT-A2", "Hội trường A2", "Đang hoạt động");
+        PhongLichItem itemHtA2 = new PhongLichItem(htA2, List.of(createLich(htA2, ngay)));
 
-        when(traCuuLichService.getChiTietPhong(1, ngay))
-                .thenReturn(new PhongLichItem(htA2, List.of(createLich(htA2, ngay))));
+        when(traCuuLichService.getDanhSachLoaiPhong()).thenReturn(List.of("Hội trường"));
+        when(traCuuLichService.getDanhSachTinhTrang()).thenReturn(List.of("Đang hoạt động"));
+        when(traCuuLichService.traCuuLich(ngay, "Hội trường", null, "")).thenReturn(List.of(itemHtA2));
+        when(traCuuLichService.traCuuLich(ngay, "", null, "")).thenReturn(List.of(itemHtA2));
+        when(traCuuLichService.getChiTietPhong(1, ngay)).thenReturn(itemHtA2);
         when(traCuuLichService.getChiTietPhong(999, ngay)).thenReturn(null);
+
+        mockMvc.perform(get("/tra-cuu-lich")
+                        .with(asSinhVien())
+                        .param("ngay", "2026-12-30")
+                        .param("loaiPhong", "Hội trường")
+                        .param("selectedId", "1"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("tra-cuu-lich"))
+                .andExpect(content().string(containsString("Hệ thống mượn phòng trực tuyến PTIT")))
+                .andExpect(content().string(containsString("href=\"/xac-nhan-dang-xuat\"")))
+                .andExpect(content().string(not(containsString("id=\"logoutModal\""))))
+                .andExpect(content().string(not(containsString("openLogoutModal"))))
+                .andExpect(content().string(containsString("class=\"selected-row\"")))
+                .andExpect(content().string(containsString("id=\"chiTietPhongSection\"")))
+                .andExpect(content().string(containsString("Hội trường A2")))
+                .andExpect(content().string(containsString("Mã phòng: HT-A2")))
+                .andExpect(content().string(containsString("Hội trường lớn")))
+                .andExpect(content().string(containsString("DM-003")))
+                .andExpect(content().string(containsString("Sinh hoạt chuyên đề cuối năm")))
+                .andExpect(content().string(containsString("08:00 - 11:00")))
+                .andExpect(content().string(containsString("CLB Tin học")))
+                .andExpect(content().string(containsString("Đã phê duyệt")))
+                .andExpect(content().string(containsString("Đóng chi tiết")))
+                .andExpect(content().string(not(containsString("Xem lịch"))))
+                .andExpect(content().string(not(containsString("/nop-don?phongId="))))
+                .andExpect(content().string(not(containsString("Nộp đơn mượn phòng này"))))
+                .andExpect(content().string(not(containsString(">Đặt lại<"))));
 
         mockMvc.perform(get("/tra-cuu-lich/1")
                         .with(asSinhVien())
                         .param("ngay", "2026-12-30"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Hệ thống mượn phòng trực tuyến PTIT")))
-                .andExpect(content().string(containsString("id=\"logoutModal\"")))
+                .andExpect(view().name("tra-cuu-lich"))
+                .andExpect(content().string(containsString("id=\"chiTietPhongSection\"")))
                 .andExpect(content().string(containsString("Hội trường A2")))
                 .andExpect(content().string(containsString("DM-003")))
                 .andExpect(content().string(containsString("Sinh hoạt chuyên đề cuối năm")))
@@ -247,11 +283,43 @@ class Module1Test {
                 .andExpect(content().string(not(containsString("/nop-don?phongId="))))
                 .andExpect(content().string(not(containsString("Nộp đơn mượn phòng này"))));
 
+        mockMvc.perform(get("/tra-cuu-lich")
+                        .with(asSinhVien())
+                        .param("ngay", "2026-12-30")
+                        .param("selectedId", "999"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("tra-cuu-lich"))
+                .andExpect(content().string(containsString("Không tìm thấy thông tin phòng được yêu cầu.")))
+                .andExpect(content().string(not(containsString("id=\"chiTietPhongSection\""))));
+
         mockMvc.perform(get("/tra-cuu-lich/999")
                         .with(asSinhVien())
                         .param("ngay", "2026-12-30"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/tra-cuu-lich?notFound=true"));
+    }
+
+    @Test
+    void viewRoomDetailWhenNoScheduleShowsEmptyNotice() throws Exception {
+        LocalDate ngay = LocalDate.of(2026, 12, 30);
+        Phong htA3 = createPhong(3, "HT-A3", "Hội trường A3", "Đang hoạt động");
+        PhongLichItem itemTrong = new PhongLichItem(htA3, List.of());
+
+        when(traCuuLichService.getDanhSachLoaiPhong()).thenReturn(List.of("Hội trường"));
+        when(traCuuLichService.getDanhSachTinhTrang()).thenReturn(List.of("Đang hoạt động"));
+        when(traCuuLichService.traCuuLich(ngay, "", null, "")).thenReturn(List.of(itemTrong));
+        when(traCuuLichService.getChiTietPhong(3, ngay)).thenReturn(itemTrong);
+
+        mockMvc.perform(get("/tra-cuu-lich")
+                        .with(asSinhVien())
+                        .param("ngay", "2026-12-30")
+                        .param("selectedId", "3"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("tra-cuu-lich"))
+                .andExpect(content().string(containsString("id=\"chiTietPhongSection\"")))
+                .andExpect(content().string(containsString("Hội trường A3")))
+                .andExpect(content().string(containsString("Phòng chưa có lịch sử dụng nào trong ngày")))
+                .andExpect(content().string(containsString("30/12/2026")));
     }
 
     @Test
@@ -456,7 +524,9 @@ class Module1Test {
                         .param("sucChuaToiThieu", "100"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Hệ thống mượn phòng trực tuyến PTIT")))
-                .andExpect(content().string(containsString("id=\"logoutModal\"")))
+                .andExpect(content().string(containsString("href=\"/xac-nhan-dang-xuat\"")))
+                .andExpect(content().string(not(containsString("id=\"logoutModal\""))))
+                .andExpect(content().string(not(containsString("openLogoutModal"))))
                 .andExpect(content().string(containsString("value=\"" + ngayHopLe.toString() + "\"")))
                 .andExpect(content().string(containsString("Hội trường A2")))
                 .andExpect(content().string(containsString("Bỏ qua và chọn tiếp tục để Trung tâm bố trí")))
@@ -668,7 +738,9 @@ class Module1Test {
                         .param("donId", "10"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Hệ thống mượn phòng trực tuyến PTIT")))
-                .andExpect(content().string(containsString("id=\"logoutModal\"")))
+                .andExpect(content().string(containsString("href=\"/xac-nhan-dang-xuat\"")))
+                .andExpect(content().string(not(containsString("id=\"logoutModal\""))))
+                .andExpect(content().string(not(containsString("openLogoutModal"))))
                 .andExpect(content().string(containsString("DM-010")))
                 .andExpect(content().string(containsString("HT-01 - Hội trường lớn")))
                 .andExpect(content().string(containsString("Trùng lịch hội nghị trường")))

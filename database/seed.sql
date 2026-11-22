@@ -11,8 +11,8 @@ INSERT INTO `tblNguoiDung` (`id`, `tenDangNhap`, `matKhau`, `hoTen`, `diaChi`, `
 (4, 'sv_khoa', '123456', 'Phạm Minh Khóa', 'Hà Đông, Hà Nội', '2004-11-02', 'khoapm@ptit.edu.vn', '0933445566', 'Ngưng');
 
 INSERT INTO `tblSinhVien` (`id`, `maSinhVien`, `khoaHoc`, `nganhHoc`, `donViId`) VALUES
-(1, 'B22DCCN001', 2022, 'Công nghệ thông tin', 1),
-(4, 'B22DCCN002', 2022, 'An toàn thông tin', 2);
+(1, 'B22DCCN001', '2022', 'Công nghệ thông tin', 1),
+(4, 'B22DCCN002', '2022', 'An toàn thông tin', 2);
 
 INSERT INTO `tblCanBoDoan` (`id`, `viTriCongViec`) VALUES
 (2, 'Cán bộ Văn phòng Đoàn Thanh niên');

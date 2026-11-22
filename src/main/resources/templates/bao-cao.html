@@ -506,8 +506,9 @@
                         </div>
                     </div>
                     <a class="btn-back"
-                        th:href="@{/bao-cao(tieuChi=${tieuChi}, tuNgay=${tuNgay}, denNgay=${denNgay})}">Đóng chi
-                        tiết</a>
+                    th:href="@{/bao-cao(tieuChi=${tieuChi}, tuNgay=${tuNgay}, denNgay=${denNgay})}">
+                    Đóng chi tiết
+                    </a>
                 </div>
 
                 <div th:if="${#lists.isEmpty(chiTietBaoCao.dsDon)}" class="msg-empty">
@@ -565,7 +566,6 @@
         </section>
     </main>
 
-    <div th:replace="~{app-shell :: logoutModal}"></div>
 
 </body>
 

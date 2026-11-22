@@ -175,6 +175,45 @@
             white-space: nowrap;
         }
         tr:hover td { background: #f9fafb; }
+        .selected-row td { background: #eff6ff; }
+        .panel + .panel { margin-top: 20px; }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .detail-item {
+            padding: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+        }
+        .detail-item-full { grid-column: 1 / -1; }
+        .detail-label {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+        .detail-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .detail-subtitle {
+            margin: 0 0 12px;
+            color: #1c355e;
+            font-size: 16px;
+        }
+        .alert-empty-info {
+            padding: 16px;
+            border-radius: 4px;
+            background: #eff6ff;
+            border: 1px dashed #93c5fd;
+            color: #1e40af;
+            font-size: 13px;
+            text-align: center;
+        }
 
         .badge {
             display: inline-block;
@@ -332,7 +371,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="item : ${ketQuaList}">
+                <tr th:each="item : ${ketQuaList}"
+                    th:classappend="${selectedId != null and selectedId == item.phong.id} ? 'selected-row' : ''">
                     <td th:text="${item.phong.maPhong}">HT-A2</td>
                     <td>
                         <strong th:text="${item.phong.tenPhong}">Hội trường A2</strong>
@@ -356,7 +396,7 @@
                     <td>
                         <div class="action-links">
                             <a class="btn-secondary btn-sm"
-                               th:href="@{/tra-cuu-lich/{id}(id=${item.phong.id}, ngay=${ngay})}">Chi tiết</a>
+                               th:href="|@{/tra-cuu-lich(ngay=${ngay}, loaiPhong=${#strings.isEmpty(loaiPhong) ? null : loaiPhong}, sucChua=${sucChua}, tinhTrang=${#strings.isEmpty(tinhTrang) ? null : tinhTrang}, selectedId=${item.phong.id})}#chiTietPhongSection|">Chi tiết</a>
                         </div>
                     </td>
                 </tr>
@@ -364,9 +404,84 @@
             </table>
         </div>
     </section>
+
+    <section class="panel" id="chiTietPhongSection" th:if="${chiTiet != null}">
+        <div class="header-row">
+            <div>
+                <h2 class="page-title" style="font-size: 20px;" th:text="${chiTiet.phong.tenPhong}">Hội trường A2</h2>
+                <p class="page-subtitle" th:text="${'Mã phòng: ' + chiTiet.phong.maPhong}">Mã phòng: HT-A2</p>
+            </div>
+            <a class="btn-secondary"
+               th:href="@{/tra-cuu-lich(ngay=${ngay}, loaiPhong=${#strings.isEmpty(loaiPhong) ? null : loaiPhong}, sucChua=${sucChua}, tinhTrang=${#strings.isEmpty(tinhTrang) ? null : tinhTrang})}">Đóng chi tiết</a>
+        </div>
+
+        <div class="detail-grid">
+            <div class="detail-item">
+                <div class="detail-label">Tòa nhà / Tầng</div>
+                <div class="detail-value"
+                     th:text="${'Nhà ' + chiTiet.phong.toaNha + ' - Tầng ' + chiTiet.phong.tang}">Nhà A2 - Tầng 1</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Loại phòng</div>
+                <div class="detail-value" th:text="${chiTiet.phong.loaiPhong}">Hội trường</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Sức chứa tối đa</div>
+                <div class="detail-value" th:text="${chiTiet.phong.sucChuaToiDa + ' chỗ'}">300 chỗ</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Tình trạng</div>
+                <div class="detail-value">
+                    <span class="badge"
+                          th:classappend="${chiTiet.sanSangMuon} ? 'badge-active' : 'badge-inactive'"
+                          th:text="${chiTiet.phong.tinhTrang}">Đang hoạt động</span>
+                </div>
+            </div>
+            <div class="detail-item detail-item-full">
+                <div class="detail-label">Trang thiết bị</div>
+                <div class="detail-value"
+                     th:text="${chiTiet.phong.trangThietBi != null && !#strings.isEmpty(chiTiet.phong.trangThietBi) ? chiTiet.phong.trangThietBi : 'Không có thông tin'}">máy chiếu</div>
+            </div>
+            <div class="detail-item detail-item-full">
+                <div class="detail-label">Mô tả</div>
+                <div class="detail-value"
+                     th:text="${chiTiet.phong.moTa != null && !#strings.isEmpty(chiTiet.phong.moTa) ? chiTiet.phong.moTa : 'Không có mô tả thêm'}">Mô tả</div>
+            </div>
+        </div>
+
+        <h3 class="detail-subtitle">
+            Lịch sử dụng ngày <span th:text="${#temporals.format(ngay, 'dd/MM/yyyy')}">30/12/2026</span>
+        </h3>
+
+        <div class="alert-empty-info" th:if="${!chiTiet.coLichTrongNgay}">
+            Phòng chưa có lịch sử dụng nào trong ngày <span th:text="${#temporals.format(ngay, 'dd/MM/yyyy')}"></span>.
+        </div>
+
+        <div class="table-wrap" th:if="${chiTiet.coLichTrongNgay}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Khung giờ</th>
+                    <th>Mã đơn</th>
+                    <th>Sự kiện</th>
+                    <th>Đơn vị sử dụng</th>
+                    <th>Trạng thái đơn</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="lich : ${chiTiet.lichTrongNgay}">
+                    <td th:text="${lich.khungGioText}">08:00 - 11:00</td>
+                    <td th:text="${lich.donMuonPhong.maDon}">DM-003</td>
+                    <td th:text="${lich.donMuonPhong.tenSuKien}">Sinh hoạt chuyên đề</td>
+                    <td th:text="${lich.donMuonPhong.donVi != null ? lich.donMuonPhong.donVi.tenCLB : 'Chưa rõ'}">CLB Tin học</td>
+                    <td th:text="${lich.donMuonPhong.trangThai != null ? lich.donMuonPhong.trangThai.tenHienThi : ''}">Đã phê duyệt</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 </main>
 
-<div th:replace="~{app-shell :: logoutModal}"></div>
 
 </body>
 </html>

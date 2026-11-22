@@ -8,35 +8,9 @@
         <span th:text="${nguoiDung.hoTen}">Người dùng</span>
         <span class="role-badge" th:text="${nguoiDung.vaiTroDisplay}">VAI TRÒ</span>
         <span>|</span>
-        <a class="btn-logout-link" th:href="@{/xac-nhan-dang-xuat}" onclick="openLogoutModal(event)">Đăng xuất</a>
+        <a class="btn-logout-link" th:href="@{/xac-nhan-dang-xuat}">Đăng xuất</a>
     </div>
 </header>
-
-<div th:fragment="logoutModal">
-    <div id="logoutModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="logoutTitle">
-        <div class="modal-box">
-            <h2 id="logoutTitle">Xác nhận đăng xuất</h2>
-            <p>Bạn muốn đăng xuất khỏi tài khoản?</p>
-            <div class="modal-actions">
-                <button type="button" class="btn-stay" onclick="closeLogoutModal()">Ở lại</button>
-                <form th:action="@{/logout}" method="post" style="margin: 0;">
-                    <button type="submit" class="btn-confirm-logout">Đăng xuất</button>
-                </form>
-            </div>
-        </div>
-    </div>
-    <script>
-        function openLogoutModal(event) {
-            if (event) event.preventDefault();
-            var modal = document.getElementById('logoutModal');
-            if (modal) modal.classList.add('open');
-        }
-        function closeLogoutModal() {
-            var modal = document.getElementById('logoutModal');
-            if (modal) modal.classList.remove('open');
-        }
-    </script>
-</div>
 
 </body>
 </html>
